@@ -28,7 +28,7 @@
           <button type="button" class="btn btn-outline-primary" onclick="setPointLimit(900)">900</button>
           <button type="button" class="btn btn-outline-primary" onclick="setPointLimit(1200)">1200</button>
         </div>
-        <div id="selected-limit" class="mt-2 fw-bold"></div>
+        <div id="selected-limit" class="mt-2 fw-bold">Selected Point Limit: 600</div>
       </div>
     </div>
 
@@ -37,9 +37,9 @@
       <thead>
         <tr>
           <th>Unit</th>
-          <th>Cost</th>
           <th>Type</th>
           <th>Rarity</th>
+          <th>Cost</th>
           <th></th>
         </tr>
       </thead>
@@ -67,7 +67,7 @@
     let filteredUnits = [];
     let armyList = [];
     let currentFaction = "";
-    let pointLimit = 0;
+    let pointLimit = 600;
 
     async function fetchUnits() {
       const res = await fetch(SHEET_URL);
@@ -88,9 +88,11 @@
             .filter(unit => unit.Name && unit.Faction && !isNaN(unit.Cost));
 
           const factions = [...new Set(allUnits.map(u => u.Faction))];
+          if (!factions.includes("UR")) factions.push("UR");
+
           const select = document.getElementById("faction");
           select.innerHTML = factions.map(f => `<option value="${f}">${f}</option>`).join('');
-          currentFaction = factions[0];
+          currentFaction = factions.includes("UR") ? "UR" : factions[0];
           select.value = currentFaction;
 
           select.addEventListener("change", e => {
@@ -120,9 +122,9 @@
       filteredUnits.forEach((unit, i) => {
         tbody.insertAdjacentHTML("beforeend", `<tr>
           <td>${unit.Name}</td>
-          <td>${unit.Cost}</td>
           <td>${unit.Type}</td>
           <td>${unit.Rarity}</td>
+          <td>${unit.Cost}</td>
           <td><button class="btn btn-sm btn-primary" onclick="addUnit(${i})">Add</button></td>
         </tr>`);
       });
@@ -140,19 +142,31 @@
     function addUnit(index) {
       const unit = filteredUnits[index];
       const total = armyList.reduce((sum, u) => sum + u.Cost, 0);
+      const isRare = unit.Rarity.toLowerCase() === "rare";
 
       const rareCount = armyList.filter(u => u.Rarity.toLowerCase() === "rare").length;
       const commonCount = armyList.filter(u => u.Rarity.toLowerCase() === "common").length;
-      const isRare = unit.Rarity.toLowerCase() === "rare";
+      const suitCount = armyList.filter(u => u.Type.toLowerCase() === "suit").length;
+      const maxUnits = Math.floor((pointLimit / 600) * 15);
+      const requiredSuits = Math.floor(pointLimit / 600) * 3;
 
       if (total + unit.Cost > pointLimit) {
         alert("Point limit exceeded!");
+        return;
+      }
+      if (armyList.length >= maxUnits) {
+        alert(`Max unit count (${maxUnits}) reached for this point level.`);
         return;
       }
       if (isRare && rareCount + 1 > commonCount) {
         alert("You cannot have more Rare units than Common units.");
         return;
       }
+      if (unit.Type.toLowerCase() !== "suit" && suitCount < requiredSuits && armyList.length + 1 === maxUnits) {
+        alert(`You must include at least ${requiredSuits} Suit units per ${pointLimit} points.`);
+        return;
+      }
+
       armyList.push(unit);
       render();
     }
