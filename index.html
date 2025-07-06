@@ -55,16 +55,6 @@
       <option value="" disabled selected>Select a Unit</option>
     </select>
 
-    <h4>Aerial Units (Common)</h4>
-    <select class="form-select mb-3" id="aerial-common-units">
-      <option value="" disabled selected>Select a Unit</option>
-    </select>
-
-    <h4>Aerial Units (Rare)</h4>
-    <select class="form-select mb-3" id="aerial-rare-units">
-      <option value="" disabled selected>Select a Unit</option>
-    </select>
-
     <h4>Army List</h4>
     <table class="table table-striped">
       <thead>
@@ -146,31 +136,25 @@
       const rareDropdown = document.getElementById("rare-units");
       const urCommonDropdown = document.getElementById("ur-common-units");
       const urRareDropdown = document.getElementById("ur-rare-units");
-      const aerialCommonDropdown = document.getElementById("aerial-common-units");
-      const aerialRareDropdown = document.getElementById("aerial-rare-units");
 
-      [commonDropdown, rareDropdown, urCommonDropdown, urRareDropdown, aerialCommonDropdown, aerialRareDropdown].forEach(drop => drop.innerHTML = '<option value="" disabled selected>Select a Unit</option>');
+      [commonDropdown, rareDropdown, urCommonDropdown, urRareDropdown].forEach(drop => drop.innerHTML = '<option value="" disabled selected>Select a Unit</option>');
 
       filteredUnits.forEach((unit, i) => {
         const opt = document.createElement("option");
         opt.value = i;
         opt.textContent = `${unit.Name} | ${unit.Type} | ${unit.Cost}`;
         const rarity = unit.Rarity.toLowerCase();
-        const type = unit.Type.toLowerCase();
 
         if (unit.Faction === "UR") {
           if (rarity === "common") urCommonDropdown.appendChild(opt);
           else urRareDropdown.appendChild(opt);
-        } else if (type === "aerial") {
-          if (rarity === "common") aerialCommonDropdown.appendChild(opt);
-          else aerialRareDropdown.appendChild(opt);
         } else {
           if (rarity === "common") commonDropdown.appendChild(opt);
           else rareDropdown.appendChild(opt);
         }
       });
 
-      [commonDropdown, rareDropdown, urCommonDropdown, urRareDropdown, aerialCommonDropdown, aerialRareDropdown].forEach(drop => {
+      [commonDropdown, rareDropdown, urCommonDropdown, urRareDropdown].forEach(drop => {
         drop.onchange = (e) => {
           const index = parseInt(e.target.value);
           addUnit(index);
@@ -199,8 +183,6 @@
       const requiredSuits = Math.floor(pointLimit / 600) * 3;
       const urCount = armyList.filter(u => u.Faction === "UR").length;
       const maxUR = Math.floor(pointLimit / 600) * 5;
-      const aerialRareCount = armyList.filter(u => u.Type.toLowerCase() === "aerial" && u.Rarity.toLowerCase() === "rare").length;
-      const aerialCommonCount = armyList.filter(u => u.Type.toLowerCase() === "aerial" && u.Rarity.toLowerCase() === "common").length;
 
       if (total + unit.Cost > pointLimit) return alert("Point limit exceeded!");
       if (armyList.length >= maxUnits) return alert(`Max unit count (${maxUnits}) reached.`);
@@ -211,8 +193,6 @@
         if (urCount >= maxUR) return alert(`No more than ${maxUR} UR units allowed.`);
         if (urCount >= suitCount) return alert("UR units must not exceed the number of Suit units.");
       }
-      if (unit.Type.toLowerCase() === "aerial" && isRare && aerialRareCount + 1 > aerialCommonCount)
-        return alert("Aerial Rare units can only be added if there are enough Common Aerial units.");
 
       armyList.push(unit);
       render();
