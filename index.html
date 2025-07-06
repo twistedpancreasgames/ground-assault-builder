@@ -35,8 +35,13 @@
       </div>
     </div>
 
-    <h4>Ground Units</h4>
-    <select class="form-select mb-3" id="unit-dropdown">
+    <h4>Ground Units (Common)</h4>
+    <select class="form-select mb-3" id="common-units">
+      <option value="" disabled selected>Select a Unit</option>
+    </select>
+
+    <h4>Ground Units (Rare)</h4>
+    <select class="form-select mb-3" id="rare-units">
       <option value="" disabled selected>Select a Unit</option>
     </select>
 
@@ -115,19 +120,32 @@
     function render() {
       filteredUnits = allUnits.filter(u => u.Faction === currentFaction);
 
-      const unitDropdown = document.getElementById("unit-dropdown");
-      unitDropdown.innerHTML = '<option value="" disabled selected>Select a Unit</option>';
+      const commonDropdown = document.getElementById("common-units");
+      const rareDropdown = document.getElementById("rare-units");
+      commonDropdown.innerHTML = '<option value="" disabled selected>Select a Unit</option>';
+      rareDropdown.innerHTML = '<option value="" disabled selected>Select a Unit</option>';
+
       filteredUnits.forEach((unit, i) => {
         const opt = document.createElement("option");
         opt.value = i;
-        opt.textContent = `${unit.Name} | ${unit.Type} | ${unit.Rarity} | ${unit.Cost}`;
-        unitDropdown.appendChild(opt);
+        opt.textContent = `${unit.Name} | ${unit.Type} | ${unit.Cost}`;
+        if (unit.Rarity.toLowerCase() === "common") {
+          commonDropdown.appendChild(opt);
+        } else if (unit.Rarity.toLowerCase() === "rare") {
+          rareDropdown.appendChild(opt);
+        }
       });
 
-      unitDropdown.onchange = (e) => {
+      commonDropdown.onchange = (e) => {
         const index = parseInt(e.target.value);
         addUnit(index);
-        unitDropdown.selectedIndex = 0;
+        commonDropdown.selectedIndex = 0;
+      };
+
+      rareDropdown.onchange = (e) => {
+        const index = parseInt(e.target.value);
+        addUnit(index);
+        rareDropdown.selectedIndex = 0;
       };
 
       const listBody = document.getElementById("army-list-body");
