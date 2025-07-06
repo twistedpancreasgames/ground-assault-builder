@@ -58,7 +58,7 @@
     <h4>Army List</h4>
     <table class="table table-striped">
       <thead>
-        <tr><th>Unit</th><th>Rarity</th><th>Cost</th><th>Training</th><th></th></tr>
+        <tr><th>Unit</th><th>Rarity</th><th>Cost</th><th>Training</th><th>Command</th><th></th></tr>
       </thead>
       <tbody id="army-list-body"></tbody>
       <tfoot>
@@ -165,6 +165,7 @@
       const listBody = document.getElementById("army-list-body");
       listBody.innerHTML = "";
       let total = 0;
+      const commandMax = Math.floor(pointLimit / 600);
       armyList.forEach((unit, i) => {
         let adjustedCost = unit.Cost;
         if (unit.Training === 'Green') {
@@ -172,15 +173,13 @@
         } else if (unit.Training === 'Elite') {
           adjustedCost = unit.Cost + 15;
         }
+        if (unit.Command && !unit.Name.toLowerCase().includes('command')) {
+          adjustedCost += 20;
+        }
         total += adjustedCost;
-        const trainingOptions = ['Green', 'Regular', 'Elite'].map(opt => `<option value="${opt}" ${unit.Training === opt ? 'selected' : (opt === 'Regular' ? 'selected' : '')}>${opt}</option>`).join('');
-        listBody.insertAdjacentHTML("beforeend", `<tr><td>${unit.Name}</td><td>${unit.Rarity}</td><td>${adjustedCost}</td><td><select class='form-select form-select-sm' onchange='updateTraining(${i}, this.value)'>${trainingOptions}</select></td><td><button class='btn btn-sm btn-danger' onclick='removeUnit(${i})'>Remove</button></td></tr>`);
-      });
-      document.getElementById("total-cost").innerText = total;
-    }
-
-    function addUnit(index) {
-      const unit = filteredUnits[index];
+        const trainingOptions = ['Green', 'Regular', 'Elite'].map(opt => `<option value="${opt}" ${unit.Training === opt ? 'selected' : ''}>${opt}</option>`).join('');
+        const commandCheckbox = `<input type='checkbox' onchange='updateCommand(${i}, this.checked)' ${unit.Command ? 'checked' : ''}>`;
+        listBody.insertAdjacentHTML("beforeend", `<tr><td>${unit.Name}</td><td>${unit.Rarity}</td><td>${adjustedCost}</td><td><select class='form-select form-select-sm' onchange='updateTraining(${i}, this.value)'>${trainingOptions}</select></td><td>${commandCheckbox}</td><td><button class='btn btn-sm btn-danger' onclick='removeUnit(${i})'>Remove</button></td></tr>`);
       const total = armyList.reduce((sum, u) => sum + u.Cost, 0);
       const isRare = unit.Rarity.toLowerCase() === "rare";
       const rareCount = armyList.filter(u => u.Rarity.toLowerCase() === "rare").length;
@@ -202,7 +201,10 @@
       }
 
       unit.Training = 'Regular';
-      armyList.push(unit);
+      unit.Command = false;
+      // Clone unit to avoid shared reference issues
+      const clonedUnit = { ...unit, Training: 'Regular' };
+      armyList.push(clonedUnit);
       render();
     }
 
@@ -223,6 +225,19 @@
       }
 
       armyList[index].Training = level;
+      render();
+    }
+
+    function updateCommand(index, isChecked) {
+      const commandMax = Math.floor(pointLimit / 600);
+      const currentCount = armyList.filter(u => u.Command).length;
+
+      if (isChecked && currentCount >= commandMax && !armyList[index].Command) {
+        alert(`Only ${commandMax} Command units allowed.`);
+        render();
+        return;
+      }
+      armyList[index].Command = isChecked;
       render();
     }
 
