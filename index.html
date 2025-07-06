@@ -10,6 +10,7 @@
   <style>
     body { padding: 2rem; }
     .unit-table th, .unit-table td { vertical-align: middle; }
+    .btn-group .btn.active { background-color: #0d6efd; color: white; }
   </style>
 </head>
 <body>
@@ -18,13 +19,15 @@
     <div class="row mb-3">
       <div class="col-md-6">
         <label for="faction" class="form-label">Faction</label>
-        <select id="faction" class="form-select"></select>
+        <select id="faction" class="form-select">
+          <option value="" disabled selected>Choose Army</option>
+        </select>
       </div>
       <div class="col-md-6">
         <label class="form-label">Point Limit</label><br />
-        <div class="btn-group" role="group">
+        <div class="btn-group" role="group" id="point-buttons">
           <button type="button" class="btn btn-outline-primary" onclick="setPointLimit(300)">300</button>
-          <button type="button" class="btn btn-outline-primary" onclick="setPointLimit(600)">600</button>
+          <button type="button" class="btn btn-outline-primary active" onclick="setPointLimit(600)">600</button>
           <button type="button" class="btn btn-outline-primary" onclick="setPointLimit(900)">900</button>
           <button type="button" class="btn btn-outline-primary" onclick="setPointLimit(1200)">1200</button>
         </div>
@@ -32,19 +35,10 @@
       </div>
     </div>
 
-    <h4>Add Units</h4>
-    <table class="table unit-table table-bordered">
-      <thead>
-        <tr>
-          <th>Unit</th>
-          <th>Type</th>
-          <th>Rarity</th>
-          <th>Cost</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody id="unit-table-body"></tbody>
-    </table>
+    <h4>Ground Units</h4>
+    <select class="form-select mb-3" id="unit-dropdown">
+      <option value="" disabled selected>Select a Unit</option>
+    </select>
 
     <h4>Army List</h4>
     <table class="table table-striped">
@@ -88,19 +82,18 @@
             .filter(unit => unit.Name && unit.Faction && !isNaN(unit.Cost));
 
           const factions = [...new Set(allUnits.map(u => u.Faction))];
-          if (!factions.includes("UR")) factions.push("UR");
-
           const select = document.getElementById("faction");
-          select.innerHTML = factions.map(f => `<option value="${f}">${f}</option>`).join('');
-          currentFaction = factions.includes("UR") ? "UR" : factions[0];
-          select.value = currentFaction;
+          factions.forEach(f => {
+            const option = document.createElement("option");
+            option.value = f;
+            option.textContent = f;
+            select.appendChild(option);
+          });
 
           select.addEventListener("change", e => {
             currentFaction = e.target.value;
             render();
           });
-
-          render();
         },
         error: function(err) {
           alert("Failed to load unit data. Please check your sheet.");
@@ -112,22 +105,30 @@
     function setPointLimit(limit) {
       pointLimit = limit;
       document.getElementById("selected-limit").innerText = `Selected Point Limit: ${limit}`;
+      document.querySelectorAll("#point-buttons .btn").forEach(btn => {
+        btn.classList.remove("active");
+        if (btn.textContent == limit.toString()) btn.classList.add("active");
+      });
       render();
     }
 
     function render() {
       filteredUnits = allUnits.filter(u => u.Faction === currentFaction);
-      const tbody = document.getElementById("unit-table-body");
-      tbody.innerHTML = "";
+
+      const unitDropdown = document.getElementById("unit-dropdown");
+      unitDropdown.innerHTML = '<option value="" disabled selected>Select a Unit</option>';
       filteredUnits.forEach((unit, i) => {
-        tbody.insertAdjacentHTML("beforeend", `<tr>
-          <td>${unit.Name}</td>
-          <td>${unit.Type}</td>
-          <td>${unit.Rarity}</td>
-          <td>${unit.Cost}</td>
-          <td><button class="btn btn-sm btn-primary" onclick="addUnit(${i})">Add</button></td>
-        </tr>`);
+        const opt = document.createElement("option");
+        opt.value = i;
+        opt.textContent = `${unit.Name} | ${unit.Type} | ${unit.Rarity} | ${unit.Cost}`;
+        unitDropdown.appendChild(opt);
       });
+
+      unitDropdown.onchange = (e) => {
+        const index = parseInt(e.target.value);
+        addUnit(index);
+        unitDropdown.selectedIndex = 0;
+      };
 
       const listBody = document.getElementById("army-list-body");
       listBody.innerHTML = "";
