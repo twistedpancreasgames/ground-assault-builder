@@ -166,9 +166,15 @@
       listBody.innerHTML = "";
       let total = 0;
       armyList.forEach((unit, i) => {
-        total += unit.Cost;
+        let adjustedCost = unit.Cost;
+        if (unit.Training === 'Green') {
+          adjustedCost = Math.max(5, unit.Cost - 10);
+        } else if (unit.Training === 'Elite') {
+          adjustedCost = unit.Cost + 15;
+        }
+        total += adjustedCost;
         const trainingOptions = ['Green', 'Regular', 'Elite'].map(opt => `<option value="${opt}" ${unit.Training === opt ? 'selected' : (opt === 'Regular' ? 'selected' : '')}>${opt}</option>`).join('');
-        listBody.insertAdjacentHTML("beforeend", `<tr><td>${unit.Name}</td><td>${unit.Rarity}</td><td>${unit.Cost}</td><td><select class='form-select form-select-sm' onchange='updateTraining(${i}, this.value)'>${trainingOptions}</select></td><td><button class='btn btn-sm btn-danger' onclick='removeUnit(${i})'>Remove</button></td></tr>`);
+        listBody.insertAdjacentHTML("beforeend", `<tr><td>${unit.Name}</td><td>${unit.Rarity}</td><td>${adjustedCost}</td><td><select class='form-select form-select-sm' onchange='updateTraining(${i}, this.value)'>${trainingOptions}</select></td><td><button class='btn btn-sm btn-danger' onclick='removeUnit(${i})'>Remove</button></td></tr>`);
       });
       document.getElementById("total-cost").innerText = total;
     }
@@ -201,6 +207,21 @@
     }
 
     function updateTraining(index, level) {
+      const greenMax = Math.floor(pointLimit / 600) * 4;
+      const eliteMax = Math.floor(pointLimit / 600) * 4;
+
+      const greenCount = armyList.filter(u => u.Training === 'Green').length;
+      const eliteCount = armyList.filter(u => u.Training === 'Elite').length;
+
+      if (level === 'Green' && greenCount >= greenMax && armyList[index].Training !== 'Green') {
+        alert(`Only ${greenMax} Green units allowed.`);
+        return;
+      }
+      if (level === 'Elite' && eliteCount >= eliteMax && armyList[index].Training !== 'Elite') {
+        alert(`Only ${eliteMax} Elite units allowed.`);
+        return;
+      }
+
       armyList[index].Training = level;
       render();
     }
