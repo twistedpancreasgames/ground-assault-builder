@@ -130,6 +130,34 @@
     }
 
     function render() {
+      // Ensure this doesn't do unit logic
+    }
+
+    function addUnit(index) {
+      const unit = filteredUnits[index];
+      const total = armyList.reduce((sum, u) => sum + (u.Training === 'Green' ? Math.max(5, u.Cost - 10) : u.Training === 'Elite' ? u.Cost + 15 : u.Cost) + (u.Command && !u.Name.toLowerCase().includes('command') ? 20 : 0), 0);
+      const isRare = unit.Rarity.toLowerCase() === "rare";
+      const rareCount = armyList.filter(u => u.Rarity.toLowerCase() === "rare").length;
+      const commonCount = armyList.filter(u => u.Rarity.toLowerCase() === "common").length;
+      const suitCount = armyList.filter(u => u.Type.toLowerCase() === "suit").length;
+      const maxUnits = Math.floor((pointLimit / 600) * 15);
+      const requiredSuits = Math.floor(pointLimit / 600) * 3;
+      const urCount = armyList.filter(u => u.Faction === "UR").length;
+      const maxUR = Math.floor(pointLimit / 600) * 5;
+
+      if (total + unit.Cost > pointLimit) return alert("Point limit exceeded!");
+      if (armyList.length >= maxUnits) return alert(`Max unit count (${maxUnits}) reached.`);
+      if (isRare && rareCount + 1 > commonCount) return alert("You cannot have more Rare units than Common units.");
+      if (unit.Type.toLowerCase() !== "suit" && suitCount < requiredSuits && armyList.length + 1 === maxUnits)
+        return alert(`You must include at least ${requiredSuits} Suit units.`);
+      if (unit.Faction === "UR") {
+        if (urCount >= maxUR) return alert(`No more than ${maxUR} UR units allowed.`);
+        if (urCount >= suitCount) return alert("UR units must not exceed the number of Suit units.");
+      }
+
+      const clonedUnit = { ...unit, Training: 'Regular', Command: false };
+      armyList.push(clonedUnit);
+      render();
       filteredUnits = allUnits.filter(u => u.Faction === currentFaction || u.Faction === "UR");
 
       const commonDropdown = document.getElementById("common-units");
@@ -200,11 +228,7 @@
         if (urCount >= suitCount) return alert("UR units must not exceed the number of Suit units.");
       }
 
-      unit.Training = 'Regular';
-      unit.Command = false;
-      // Clone unit to avoid shared reference issues
-      const clonedUnit = { ...unit, Training: 'Regular' };
-      armyList.push(clonedUnit);
+      
     }
 
     function updateTraining(index, level) {
