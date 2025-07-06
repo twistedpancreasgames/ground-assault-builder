@@ -45,14 +45,24 @@
       <option value="" disabled selected>Select a Unit</option>
     </select>
 
+    <h4>UR Ground Units (Common)</h4>
+    <select class="form-select mb-3" id="ur-common-units">
+      <option value="" disabled selected>Select a Unit</option>
+    </select>
+
+    <h4>UR Ground Units (Rare)</h4>
+    <select class="form-select mb-3" id="ur-rare-units">
+      <option value="" disabled selected>Select a Unit</option>
+    </select>
+
     <h4>Army List</h4>
     <table class="table table-striped">
       <thead>
-        <tr><th>Unit</th><th>Cost</th><th></th></tr>
+        <tr><th>Unit</th><th>Cost</th><th>Rarity</th><th></th></tr>
       </thead>
       <tbody id="army-list-body"></tbody>
       <tfoot>
-        <tr><td><strong>Total:</strong></td><td id="total-cost">0</td><td></td></tr>
+        <tr><td><strong>Total:</strong></td><td id="total-cost">0</td><td></td><td></td></tr>
       </tfoot>
     </table>
 
@@ -86,8 +96,9 @@
             }))
             .filter(unit => unit.Name && unit.Faction && !isNaN(unit.Cost));
 
-          const factions = [...new Set(allUnits.map(u => u.Faction))];
+          const factions = [...new Set(allUnits.map(u => u.Faction).filter(f => f !== "UR"))];
           const select = document.getElementById("faction");
+          select.innerHTML = '<option value="" disabled selected>Choose Army</option>';
           factions.forEach(f => {
             const option = document.createElement("option");
             option.value = f;
@@ -97,6 +108,7 @@
 
           select.addEventListener("change", e => {
             currentFaction = e.target.value;
+            armyList = [];
             render();
           });
         },
@@ -118,42 +130,41 @@
     }
 
     function render() {
-      filteredUnits = allUnits.filter(u => u.Faction === currentFaction);
-
+      filteredUnits = allUnits.filter(u => u.Faction === currentFaction || u.Faction === "UR");
       const commonDropdown = document.getElementById("common-units");
       const rareDropdown = document.getElementById("rare-units");
-      commonDropdown.innerHTML = '<option value="" disabled selected>Select a Unit</option>';
-      rareDropdown.innerHTML = '<option value="" disabled selected>Select a Unit</option>';
+      const urCommonDropdown = document.getElementById("ur-common-units");
+      const urRareDropdown = document.getElementById("ur-rare-units");
+
+      [commonDropdown, rareDropdown, urCommonDropdown, urRareDropdown].forEach(drop => drop.innerHTML = '<option value="" disabled selected>Select a Unit</option>');
 
       filteredUnits.forEach((unit, i) => {
         const opt = document.createElement("option");
         opt.value = i;
         opt.textContent = `${unit.Name} | ${unit.Type} | ${unit.Cost}`;
-        if (unit.Rarity.toLowerCase() === "common") {
-          commonDropdown.appendChild(opt);
-        } else if (unit.Rarity.toLowerCase() === "rare") {
-          rareDropdown.appendChild(opt);
+        if (unit.Faction === "UR") {
+          if (unit.Rarity.toLowerCase() === "common") urCommonDropdown.appendChild(opt);
+          else urRareDropdown.appendChild(opt);
+        } else {
+          if (unit.Rarity.toLowerCase() === "common") commonDropdown.appendChild(opt);
+          else rareDropdown.appendChild(opt);
         }
       });
 
-      commonDropdown.onchange = (e) => {
-        const index = parseInt(e.target.value);
-        addUnit(index);
-        commonDropdown.selectedIndex = 0;
-      };
-
-      rareDropdown.onchange = (e) => {
-        const index = parseInt(e.target.value);
-        addUnit(index);
-        rareDropdown.selectedIndex = 0;
-      };
+      [commonDropdown, rareDropdown, urCommonDropdown, urRareDropdown].forEach(drop => {
+        drop.onchange = (e) => {
+          const index = parseInt(e.target.value);
+          addUnit(index);
+          drop.selectedIndex = 0;
+        };
+      });
 
       const listBody = document.getElementById("army-list-body");
       listBody.innerHTML = "";
       let total = 0;
       armyList.forEach((unit, i) => {
         total += unit.Cost;
-        listBody.insertAdjacentHTML("beforeend", `<tr><td>${unit.Name}</td><td>${unit.Cost}</td><td><button class='btn btn-sm btn-danger' onclick='removeUnit(${i})'>Remove</button></td></tr>`);
+        listBody.insertAdjacentHTML("beforeend", `<tr><td>${unit.Name}</td><td>${unit.Cost}</td><td>${unit.Rarity}</td><td><button class='btn btn-sm btn-danger' onclick='removeUnit(${i})'>Remove</button></td></tr>`);
       });
       document.getElementById("total-cost").innerText = total;
     }
@@ -162,28 +173,22 @@
       const unit = filteredUnits[index];
       const total = armyList.reduce((sum, u) => sum + u.Cost, 0);
       const isRare = unit.Rarity.toLowerCase() === "rare";
-
       const rareCount = armyList.filter(u => u.Rarity.toLowerCase() === "rare").length;
       const commonCount = armyList.filter(u => u.Rarity.toLowerCase() === "common").length;
       const suitCount = armyList.filter(u => u.Type.toLowerCase() === "suit").length;
       const maxUnits = Math.floor((pointLimit / 600) * 15);
       const requiredSuits = Math.floor(pointLimit / 600) * 3;
+      const urCount = armyList.filter(u => u.Faction === "UR").length;
+      const maxUR = Math.floor(pointLimit / 600) * 5;
 
-      if (total + unit.Cost > pointLimit) {
-        alert("Point limit exceeded!");
-        return;
-      }
-      if (armyList.length >= maxUnits) {
-        alert(`Max unit count (${maxUnits}) reached for this point level.`);
-        return;
-      }
-      if (isRare && rareCount + 1 > commonCount) {
-        alert("You cannot have more Rare units than Common units.");
-        return;
-      }
-      if (unit.Type.toLowerCase() !== "suit" && suitCount < requiredSuits && armyList.length + 1 === maxUnits) {
-        alert(`You must include at least ${requiredSuits} Suit units per ${pointLimit} points.`);
-        return;
+      if (total + unit.Cost > pointLimit) return alert("Point limit exceeded!");
+      if (armyList.length >= maxUnits) return alert(`Max unit count (${maxUnits}) reached.`);
+      if (isRare && rareCount + 1 > commonCount) return alert("You cannot have more Rare units than Common units.");
+      if (unit.Type.toLowerCase() !== "suit" && suitCount < requiredSuits && armyList.length + 1 === maxUnits)
+        return alert(`You must include at least ${requiredSuits} Suit units.`);
+      if (unit.Faction === "UR") {
+        if (urCount >= maxUR) return alert(`No more than ${maxUR} UR units allowed.`);
+        if (urCount >= suitCount) return alert("UR units must not exceed the number of Suit units.");
       }
 
       armyList.push(unit);
@@ -202,7 +207,7 @@
       doc.text("Ground Assault Army List", 20, 20);
       let y = 30;
       armyList.forEach(unit => {
-        doc.text(`${unit.Name} - ${unit.Cost} pts`, 20, y);
+        doc.text(`${unit.Name} - ${unit.Cost} pts (${unit.Rarity})`, 20, y);
         y += 10;
       });
       doc.text(`Total: ${armyList.reduce((sum, u) => sum + u.Cost, 0)} pts`, 20, y + 10);
