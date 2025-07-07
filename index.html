@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MaK Army Builder V0.2</title>
+  <title>MaK Army Builder V0.3</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
@@ -15,7 +15,7 @@
 </head>
 <body>
   <div class="container">
-    <h2 class="mb-4">MaK Army Builder V0.2</h2>
+    <h2 class="mb-4">MaK Army Builder V0.3</h2>
     <div class="row mb-3">
       <div class="col-md-6">
         <label for="faction" class="form-label">Faction</label>
@@ -58,7 +58,7 @@
     <h4>Army List</h4>
     <table class="table table-striped">
       <thead>
-        <tr><th>Unit</th><th>Rarity</th><th>Panzerfaust</th><th>Cost</th><th></th></tr>
+        <tr><th>Unit</th><th>Rarity</th><th>Panzerfaust</th><th>Command</th><th>Cost</th><th></th></tr>
       </thead>
       <tbody id="army-list-body"></tbody>
       <tfoot>
@@ -168,12 +168,14 @@
       let total = 0;
       let extraCost = 0;
       armyList.forEach((unit, i) => {
+        if (!('Command' in unit)) unit.Command = false;
         if (!('Panzerfaust' in unit)) unit.Panzerfaust = false;
         if (!('Wound' in unit)) unit.Wound = 0;
         const extra = unit.Panzerfaust ? parseInt(unit.Wound || 0) : 0;
-        const adjustedCost = unit.Cost + extra;
+        let commandExtra = (unit.Command && !unit.Name.toLowerCase().includes('command')) ? 20 : 0;
+        const adjustedCost = unit.Cost + extra + commandExtra;
         total += adjustedCost;
-        listBody.insertAdjacentHTML("beforeend", `<tr><td>${unit.Name}</td><td>${unit.Rarity}</td><td><input type='checkbox' onchange='togglePanzerfaust(${i})' ${unit.Panzerfaust ? "checked" : ""}></td><td>${adjustedCost}</td><td><button class='btn btn-sm btn-danger' onclick='removeUnit(${i})'>Remove</button></td></tr>`);
+        listBody.insertAdjacentHTML("beforeend", `<tr><td>${unit.Name}</td><td>${unit.Rarity}</td><td><input type='checkbox' onchange='togglePanzerfaust(${i})' ${unit.Panzerfaust ? "checked" : ""}></td><td>${unit.Name.toLowerCase().includes('command') ? '-' : `<input type='checkbox' onchange='toggleCommand(${i})' ${unit.Command ? 'checked' : ''}>`}</td><td>${adjustedCost}</td><td><button class='btn btn-sm btn-danger' onclick='removeUnit(${i})'>Remove</button></td></tr>`);
       });
       document.getElementById("total-cost").innerText = total;
     }
@@ -188,13 +190,31 @@
       const clonedUnit = { ...unit };
       clonedUnit.Panzerfaust = false;
       clonedUnit.Wound = unit.Wound || 0;
+      clonedUnit.Command = false;
       armyList.push(clonedUnit);
       render();
     }
 
     function togglePanzerfaust(index) {
-      armyList[index].Panzerfaust = !armyList[index].Panzerfaust;
+      const unit = armyList[index];
+      if (!['suit', 'infantry'].includes(unit.Type.toLowerCase())) {
+        alert('Only Suits and Infantry can use Panzerfausts.');
+        return;
+      }
+      unit.Panzerfaust = !unit.Panzerfaust;
       render();
+    }
+
+    function toggleCommand(index) {
+      const maxCommand = Math.floor(pointLimit / 600);
+      const count = armyList.filter(u => u.Command).length;
+      const unit = armyList[index];
+      if (unit.Command || count < maxCommand) {
+        unit.Command = !unit.Command;
+        render();
+      } else {
+        alert(`Only ${maxCommand} Command unit(s) allowed.`);
+      }
     }
 
     function removeUnit(index) {
