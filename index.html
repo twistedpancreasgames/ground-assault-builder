@@ -58,7 +58,7 @@
     <h4>Army List</h4>
     <table class="table table-striped">
       <thead>
-        <tr><th>Unit</th><th>Rarity</th><th>Cost</th><th>Training</th><th>Command</th><th></th></tr>
+        <tr><th>Unit</th><th>Rarity</th><th>Cost</th><th></th></tr>
       </thead>
       <tbody id="army-list-body"></tbody>
       <tfoot>
@@ -130,34 +130,6 @@
     }
 
     function render() {
-      // Ensure this doesn't do unit logic
-    }
-
-    function addUnit(index) {
-      const unit = filteredUnits[index];
-      const total = armyList.reduce((sum, u) => sum + (u.Training === 'Green' ? Math.max(5, u.Cost - 10) : u.Training === 'Elite' ? u.Cost + 15 : u.Cost) + (u.Command && !u.Name.toLowerCase().includes('command') ? 20 : 0), 0);
-      const isRare = unit.Rarity.toLowerCase() === "rare";
-      const rareCount = armyList.filter(u => u.Rarity.toLowerCase() === "rare").length;
-      const commonCount = armyList.filter(u => u.Rarity.toLowerCase() === "common").length;
-      const suitCount = armyList.filter(u => u.Type.toLowerCase() === "suit").length;
-      const maxUnits = Math.floor((pointLimit / 600) * 15);
-      const requiredSuits = Math.floor(pointLimit / 600) * 3;
-      const urCount = armyList.filter(u => u.Faction === "UR").length;
-      const maxUR = Math.floor(pointLimit / 600) * 5;
-
-      if (total + unit.Cost > pointLimit) return alert("Point limit exceeded!");
-      if (armyList.length >= maxUnits) return alert(`Max unit count (${maxUnits}) reached.`);
-      if (isRare && rareCount + 1 > commonCount) return alert("You cannot have more Rare units than Common units.");
-      if (unit.Type.toLowerCase() !== "suit" && suitCount < requiredSuits && armyList.length + 1 === maxUnits)
-        return alert(`You must include at least ${requiredSuits} Suit units.`);
-      if (unit.Faction === "UR") {
-        if (urCount >= maxUR) return alert(`No more than ${maxUR} UR units allowed.`);
-        if (urCount >= suitCount) return alert("UR units must not exceed the number of Suit units.");
-      }
-
-      const clonedUnit = { ...unit, Training: 'Regular', Command: false };
-      armyList.push(clonedUnit);
-      render();
       filteredUnits = allUnits.filter(u => u.Faction === currentFaction || u.Faction === "UR");
 
       const commonDropdown = document.getElementById("common-units");
@@ -193,74 +165,17 @@
       const listBody = document.getElementById("army-list-body");
       listBody.innerHTML = "";
       let total = 0;
-      const commandMax = Math.floor(pointLimit / 600);
       armyList.forEach((unit, i) => {
-        let adjustedCost = unit.Cost;
-        if (unit.Training === 'Green') {
-          adjustedCost = Math.max(5, unit.Cost - 10);
-        } else if (unit.Training === 'Elite') {
-          adjustedCost = unit.Cost + 15;
-        }
-        if (unit.Command && !unit.Name.toLowerCase().includes('command')) {
-          adjustedCost += 20;
-        }
-        total += adjustedCost;
-        const trainingOptions = ['Green', 'Regular', 'Elite'].map(opt => `<option value="${opt}" ${unit.Training === opt ? 'selected' : ''}>${opt}</option>`).join('');
-        const commandCheckbox = `<input type='checkbox' onchange='updateCommand(${i}, this.checked)' ${unit.Command ? 'checked' : ''}>`;
-        listBody.insertAdjacentHTML("beforeend", `<tr><td>${unit.Name}</td><td>${unit.Rarity}</td><td>${adjustedCost}</td><td><select class='form-select form-select-sm' onchange='updateTraining(${i}, this.value)'>${trainingOptions}</select></td><td>${commandCheckbox}</td><td><button class='btn btn-sm btn-danger' onclick='removeUnit(${i})'>Remove</button></td></tr>`);
-      const total = armyList.reduce((sum, u) => sum + u.Cost, 0);
-      const isRare = unit.Rarity.toLowerCase() === "rare";
-      const rareCount = armyList.filter(u => u.Rarity.toLowerCase() === "rare").length;
-      const commonCount = armyList.filter(u => u.Rarity.toLowerCase() === "common").length;
-      const suitCount = armyList.filter(u => u.Type.toLowerCase() === "suit").length;
-      const maxUnits = Math.floor((pointLimit / 600) * 15);
-      const requiredSuits = Math.floor(pointLimit / 600) * 3;
-      const urCount = armyList.filter(u => u.Faction === "UR").length;
-      const maxUR = Math.floor(pointLimit / 600) * 5;
-
-      if (total + unit.Cost > pointLimit) return alert("Point limit exceeded!");
-      if (armyList.length >= maxUnits) return alert(`Max unit count (${maxUnits}) reached.`);
-      if (isRare && rareCount + 1 > commonCount) return alert("You cannot have more Rare units than Common units.");
-      if (unit.Type.toLowerCase() !== "suit" && suitCount < requiredSuits && armyList.length + 1 === maxUnits)
-        return alert(`You must include at least ${requiredSuits} Suit units.`);
-      if (unit.Faction === "UR") {
-        if (urCount >= maxUR) return alert(`No more than ${maxUR} UR units allowed.`);
-        if (urCount >= suitCount) return alert("UR units must not exceed the number of Suit units.");
-      }
-
-      
+        total += unit.Cost;
+        listBody.insertAdjacentHTML("beforeend", `<tr><td>${unit.Name}</td><td>${unit.Rarity}</td><td>${unit.Cost}</td><td><button class='btn btn-sm btn-danger' onclick='removeUnit(${i})'>Remove</button></td></tr>`);
+      });
+      document.getElementById("total-cost").innerText = total;
     }
 
-    function updateTraining(index, level) {
-      const greenMax = Math.floor(pointLimit / 600) * 4;
-      const eliteMax = Math.floor(pointLimit / 600) * 4;
-
-      const greenCount = armyList.filter(u => u.Training === 'Green').length;
-      const eliteCount = armyList.filter(u => u.Training === 'Elite').length;
-
-      if (level === 'Green' && greenCount >= greenMax && armyList[index].Training !== 'Green') {
-        alert(`Only ${greenMax} Green units allowed.`);
-        return;
-      }
-      if (level === 'Elite' && eliteCount >= eliteMax && armyList[index].Training !== 'Elite') {
-        alert(`Only ${eliteMax} Elite units allowed.`);
-        return;
-      }
-
-      armyList[index].Training = level;
-      render();
-    }
-
-    function updateCommand(index, isChecked) {
-      const commandMax = Math.floor(pointLimit / 600);
-      const currentCount = armyList.filter(u => u.Command).length;
-
-      if (isChecked && currentCount >= commandMax && !armyList[index].Command) {
-        alert(`Only ${commandMax} Command units allowed.`);
-        render();
-        return;
-      }
-      armyList[index].Command = isChecked;
+    function addUnit(index) {
+      const unit = filteredUnits[index];
+      const clonedUnit = { ...unit };
+      armyList.push(clonedUnit);
       render();
     }
 
