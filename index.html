@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MaK Army Builder V0.5</title>
+  <title>MaK Army Builder V0.7</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
@@ -15,7 +15,7 @@
 </head>
 <body>
   <div class="container">
-    <h2 class="mb-4">MaK Army Builder V0.5</h2>
+    <h2 class="mb-4">MaK Army Builder V0.7</h2>
     <div class="row mb-3">
       <div class="col-md-6">
         <label for="faction" class="form-label">Faction</label>
@@ -191,6 +191,28 @@
         if (currentHeroCount >= maxHero) return alert(`Only ${maxHero} Hero unit(s) allowed.`);
       }
       const clonedUnit = { ...unit };
+      const adjustedTotal = armyList.reduce((sum, u) => {
+        let base = u.Cost;
+        if (u.Training === 'Green') base = Math.max(5, base - 10);
+        if (u.Training === 'Elite') base += 15;
+        if (u.Panzerfaust && ['suit', 'infantry'].includes(u.Type.toLowerCase())) base += u.Wound;
+        if (u.Command && !u.Name.toLowerCase().includes('command')) base += 20;
+        return sum + base;
+      }, 0);
+      if (adjustedTotal + unit.Cost > pointLimit) {
+        alert("Adding this unit would exceed the point limit.");
+        return;
+      }
+
+      const rarity = unit.Rarity?.toLowerCase();
+      if (rarity === 'rare') {
+        const rareCount = armyList.filter(u => u.Rarity?.toLowerCase() === 'rare' && ['suit', 'vehicle'].includes(u.Type?.toLowerCase())).length;
+        const commonCount = armyList.filter(u => u.Rarity?.toLowerCase() === 'common' && ['suit', 'vehicle'].includes(u.Type?.toLowerCase())).length;
+        if (rareCount + 1 > commonCount) {
+          alert("You cannot have more Rare Suits/Vehicles than Common ones.");
+          return;
+        }
+      }
       clonedUnit.Panzerfaust = false;
       clonedUnit.Wound = unit.Wound || 0;
       clonedUnit.Command = false;
