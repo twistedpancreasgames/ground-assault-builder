@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MaK Army Builder V0.8</title>
+  <title>MaK Army Builder V0.9</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
@@ -15,7 +15,7 @@
 </head>
 <body>
   <div class="container">
-    <h2 class="mb-4">MaK Army Builder V0.8</h2>
+    <h2 class="mb-4">MaK Army Builder V0.9</h2>
     <div class="row mb-3">
       <div class="col-md-6">
         <label for="faction" class="form-label">Faction</label>
@@ -281,15 +281,30 @@
 
     function exportToPDF() {
       const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
       doc.setFontSize(14);
       doc.text("MaK Army List", 20, 20);
       let y = 30;
       armyList.forEach(unit => {
-        doc.text(`${unit.Name} - ${unit.Cost} pts (${unit.Rarity})`, 20, y);
+        const panzerfaust = unit.Panzerfaust ? 'Yes' : 'No';
+        const command = unit.Command ? 'Yes' : 'No';
+        const training = unit.Training || 'Regular';
+        let base = unit.Cost;
+        if (training === 'Green') base = Math.max(5, base - 10);
+        if (training === 'Elite') base += 15;
+        if (unit.Panzerfaust && ['suit', 'infantry'].includes(unit.Type.toLowerCase())) base += unit.Wound;
+        if (unit.Command && !unit.Name.toLowerCase().includes('command')) base += 20;
+        doc.text(`${unit.Name} - ${base} pts | Rarity: ${unit.Rarity} | Panzerfaust: ${panzerfaust} | Command: ${command} | Training: ${training}`, 20, y);
         y += 10;
       });
-      doc.text(`Total: ${armyList.reduce((sum, u) => sum + u.Cost, 0)} pts`, 20, y + 10);
+      const totalCost = armyList.reduce((sum, u) => {
+        let base = u.Cost;
+        if (u.Training === 'Green') base = Math.max(5, base - 10);
+        if (u.Training === 'Elite') base += 15;
+        if (u.Panzerfaust && ['suit', 'infantry'].includes(u.Type.toLowerCase())) base += u.Wound;
+        if (u.Command && !u.Name.toLowerCase().includes('command')) base += 20;
+        return sum + base;
+      }, 0);
+      doc.text(`Total: ${totalCost} pts`, 20, y + 10);
       doc.save("mak-army.pdf");
     }
 
