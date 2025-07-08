@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MaK Army Builder V1.1</title>
+  <title>MaK Army Builder V1.2</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <style>
     body { padding: 2rem; }
@@ -15,7 +16,7 @@
 </head>
 <body>
   <div class="container">
-    <h2 class="mb-4">MaK Army Builder V1.1</h2>
+    <h2 class="mb-4">MaK Army Builder V1.2</h2>
     <div class="row mb-3">
       <div class="col-md-6">
         <label for="faction" class="form-label">Faction</label>
@@ -62,7 +63,7 @@
       </thead>
       <tbody id="army-list-body"></tbody>
       <tfoot>
-        <tr><td><strong>Total:</strong></td><td id="total-cost">0</td><td></td><td></td></tr>
+        <tr><td><strong>Total:</strong></td><td id="total-cost">0 / <span id='limit-points'>600</span></td><td></td><td></td></tr>
       </tfoot>
     </table>
 
@@ -123,6 +124,7 @@
     function setPointLimit(limit) {
       pointLimit = limit;
       document.getElementById("selected-limit").innerText = `Selected Point Limit: ${limit}`;
+      document.getElementById("limit-points").innerText = limit;
       document.querySelectorAll("#point-buttons .btn").forEach(btn => {
         btn.classList.remove("active");
         if (btn.textContent == limit.toString()) btn.classList.add("active");
@@ -305,7 +307,25 @@
         if (u.Command && !u.Name.toLowerCase().includes('command')) base += 20;
         return sum + base;
       }, 0);
-      doc.text(`Total: ${totalCost} pts`, 20, y + 10);
+      doc.autoTable({
+        startY: y + 10,
+        head: [['Unit', 'Rarity', 'Panzerfaust', 'Command', 'Training', 'Cost']],
+        body: armyList.map(unit => {
+          const panzerfaust = unit.Panzerfaust ? 'Yes' : 'No';
+          const command = unit.Command ? 'Yes' : 'No';
+          const training = unit.Training || 'Regular';
+          let base = unit.Cost;
+          if (training === 'Green') base = Math.max(5, base - 10);
+          if (training === 'Elite') base += 15;
+          if (unit.Panzerfaust && ['suit', 'infantry'].includes(unit.Type.toLowerCase())) base += unit.Wound;
+          if (unit.Command && !unit.Name.toLowerCase().includes('command')) base += 20;
+          return [unit.Name, unit.Rarity, panzerfaust, command, training, `${base} pts`];
+        }),
+        styles: { fontSize: 10, cellPadding: 2, overflow: 'linebreak' },
+        theme: 'striped',
+        headStyles: { fillColor: [33, 37, 41] }
+      });
+      doc.text(`Total: ${totalCost} pts`, 20, doc.lastAutoTable.finalY + 10);
       doc.save("mak-army.pdf");
     }
 
