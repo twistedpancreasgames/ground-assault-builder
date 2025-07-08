@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MaK Army Builder V1.0</title>
+  <title>MaK Army Builder V1.1</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
@@ -15,7 +15,7 @@
 </head>
 <body>
   <div class="container">
-    <h2 class="mb-4">MaK Army Builder V1.0</h2>
+    <h2 class="mb-4">MaK Army Builder V1.1</h2>
     <div class="row mb-3">
       <div class="col-md-6">
         <label for="faction" class="form-label">Faction</label>
@@ -294,7 +294,7 @@
         if (training === 'Elite') base += 15;
         if (unit.Panzerfaust && ['suit', 'infantry'].includes(unit.Type.toLowerCase())) base += unit.Wound;
         if (unit.Command && !unit.Name.toLowerCase().includes('command')) base += 20;
-        doc.text(`${unit.Name} - ${base} pts | Rarity: ${unit.Rarity} | Panzerfaust: ${panzerfaust} | Command: ${command} | Training: ${training}`, 20, y);
+        doc.text(`${unit.Name} - ${base} pts | Rarity: ${unit.Rarity} | Panzerfaust: ${panzerfaust} | Command: ${command} | Training: ${training}`, 20, y, { maxWidth: 170 });
         y += 10;
       });
       const totalCost = armyList.reduce((sum, u) => {
