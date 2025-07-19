@@ -1,0 +1,207 @@
+/* General Styling */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f0f2f5;
+    color: #333;
+    margin: 0;
+    font-size: 16px;
+}
+
+header {
+    background-color: #333;
+    color: white;
+    padding: 1rem 2rem;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+h1 {
+    margin: 0 0 1rem 0;
+}
+
+.setup-controls {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+}
+
+.control-group label {
+    margin-right: 0.5rem;
+}
+
+.control-group select {
+    padding: 0.5rem;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+}
+
+/* Main Layout */
+.builder-container {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    max-width: 1400px;
+    margin: auto;
+}
+
+.panel {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    padding: 1.5rem;
+    flex-basis: 50%;
+    overflow-y: auto;
+    height: 65vh;
+}
+
+h2 {
+    margin-top: 0;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 0.75rem;
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-bottom: 1rem;
+}
+
+/* Unit Card Styling */
+.unit-card {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.unit-card h3 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.unit-card .unit-meta {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.unit-card .unit-cost {
+    font-weight: bold;
+    color: #007bff;
+}
+
+.unit-card button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+.add-btn {
+    background-color: #28a745;
+    color: white;
+}
+.add-btn:hover { background-color: #218838; }
+
+.remove-btn {
+    background-color: #dc3545;
+    color: white;
+}
+.remove-btn:hover { background-color: #c82333; }
+
+
+/* Army List Specific Styles */
+.your-army .empty-message {
+    text-align: center;
+    color: #888;
+    padding: 2rem;
+}
+
+.army-unit-card {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.army-unit-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.unit-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    border-top: 1px solid #eee;
+    padding-top: 1rem;
+    font-size: 0.9rem;
+}
+.unit-options label { margin-right: 5px; }
+.unit-options select, .unit-options input {
+    margin-right: 10px;
+}
+
+/* Footer Summary Panel */
+footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #fff;
+    border-top: 1px solid #ccc;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
+    box-sizing: border-box;
+}
+
+.summary-stats {
+    display: flex;
+    gap: 2rem;
+    font-size: 1.1rem;
+}
+
+.summary-stats strong {
+    color: #0056b3;
+}
+
+#export-pdf {
+    background-color: #007bff;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#export-pdf:hover {
+    background-color: #0056b3;
+}
+
+/* Validation Box */
+#validation-box {
+    flex-grow: 1;
+    text-align: center;
+    font-weight: bold;
+}
+
+#validation-box.valid {
+    color: #28a745;
+}
+
+#validation-box.invalid {
+    color: #dc3545;
+}
