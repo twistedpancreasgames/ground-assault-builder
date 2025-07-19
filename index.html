@@ -187,12 +187,18 @@
   const selectedUnit = filteredUnits[index];
 
   if (selectedUnit.Type.toLowerCase() === 'support') {
-    const parentKeyword = selectedUnit.Name.toLowerCase().split(' ').slice(-2).join(' ');
-    const hasParent = armyList.some(u => u.Name.toLowerCase().includes(parentKeyword));
+    const parentUnitName = selectedUnit.Type.toLowerCase().replace(' support', '').trim();
+    const hasParent = armyList.some(u => u.Name.toLowerCase().includes(parentUnitName));
     if (!hasParent) {
       alert("Select Parent Unit before selecting a Support Unit");
       return;
     }
+    const supportAlreadyExists = armyList.some(u => u.Type.toLowerCase() === 'support' && u.Name.toLowerCase().includes(parentUnitName));
+    if (supportAlreadyExists) {
+      alert("Only one Support Unit per Parent Unit name allowed.");
+      return;
+    }
+  }
     const supportAlreadyExists = armyList.some(u => u.Type.toLowerCase() === 'support' && u.Name.toLowerCase().includes(parentKeyword));
     if (supportAlreadyExists) {
       alert("Only one Support Unit per Parent Unit name allowed.");
