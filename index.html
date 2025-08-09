@@ -36,22 +36,34 @@
     </div>
 
     <h4>Ground Units (Common)</h4>
-    <select class="form-select mb-3" id="common-units"></select>
+    <select class="form-select mb-3" id="common-units">
+      <option value="" disabled selected>Select a Unit</option>
+    </select>
 
     <h4>Ground Units (Rare)</h4>
-    <select class="form-select mb-3" id="rare-units"></select>
+    <select class="form-select mb-3" id="rare-units">
+      <option value="" disabled selected>Select a Unit</option>
+    </select>
 
     <h4>UR Ground Units (Common)</h4>
-    <select class="form-select mb-3" id="ur-common-units"></select>
+    <select class="form-select mb-3" id="ur-common-units">
+      <option value="" disabled selected>Select a Unit</option>
+    </select>
 
     <h4>UR Ground Units (Rare)</h4>
-    <select class="form-select mb-3" id="ur-rare-units"></select>
+    <select class="form-select mb-3" id="ur-rare-units">
+      <option value="" disabled selected>Select a Unit</option>
+    </select>
 
     <h4>Aerial Units (Common)</h4>
-    <select class="form-select mb-3" id="aerial-common-units"></select>
+    <select class="form-select mb-3" id="aerial-common-units">
+      <option value="" disabled selected>Select a Unit</option>
+    </select>
 
     <h4>Aerial Units (Rare)</h4>
-    <select class="form-select mb-3" id="aerial-rare-units"></select>
+    <select class="form-select mb-3" id="aerial-rare-units">
+      <option value="" disabled selected>Select a Unit</option>
+    </select>
 
     <h4>Army List</h4>
     <table class="table table-striped">
@@ -69,67 +81,64 @@
 
   <script>
     const sheetUrl = 'https://docs.google.com/spreadsheets/d/1fofK8kEvGMV7-ZGSWdJHExhFU0iBBaE3XpzNSucHlpg/gviz/tq?tqx=out:csv';
-    let unitData = [];
+    let unitsData = [];
 
     Papa.parse(sheetUrl, {
       download: true,
       header: true,
       complete: function(results) {
-        unitData = results.data;
+        unitsData = results.data;
         populateFactionDropdown();
       }
     });
 
     function populateFactionDropdown() {
-      const factions = [...new Set(unitData.map(u => u.Faction).filter(Boolean))];
+      const factions = [...new Set(unitsData.map(u => u.Faction).filter(Boolean))];
       const factionSelect = document.getElementById('faction');
       factions.forEach(faction => {
-        let opt = document.createElement('option');
-        opt.value = faction;
-        opt.textContent = faction;
-        factionSelect.appendChild(opt);
+        const option = document.createElement('option');
+        option.value = faction;
+        option.textContent = faction;
+        factionSelect.appendChild(option);
       });
-
-      factionSelect.addEventListener('change', () => {
-        populateUnitDropdowns(factionSelect.value);
-      });
+      factionSelect.addEventListener('change', populateUnitDropdowns);
     }
 
-    function populateUnitDropdowns(faction) {
-      const common = document.getElementById('common-units');
-      const rare = document.getElementById('rare-units');
-      const urCommon = document.getElementById('ur-common-units');
-      const urRare = document.getElementById('ur-rare-units');
-      const aerialCommon = document.getElementById('aerial-common-units');
-      const aerialRare = document.getElementById('aerial-rare-units');
+    function populateUnitDropdowns() {
+      const faction = document.getElementById('faction').value;
+      const commonSelect = document.getElementById('common-units');
+      const rareSelect = document.getElementById('rare-units');
+      const urCommonSelect = document.getElementById('ur-common-units');
+      const urRareSelect = document.getElementById('ur-rare-units');
+      const aerialCommonSelect = document.getElementById('aerial-common-units');
+      const aerialRareSelect = document.getElementById('aerial-rare-units');
 
-      [common, rare, urCommon, urRare, aerialCommon, aerialRare].forEach(sel => sel.innerHTML = '<option disabled selected>Select a Unit</option>');
+      [commonSelect, rareSelect, urCommonSelect, urRareSelect, aerialCommonSelect, aerialRareSelect].forEach(sel => sel.innerHTML = '<option value="" disabled selected>Select a Unit</option>');
 
-      unitData.filter(u => u.Faction === faction || u.Faction === 'UR').forEach(u => {
-        if (u.Type === 'Aerial') {
-          if (u.Rarity === 'Common') aerialCommon.innerHTML += `<option>${u.Unit}</option>`;
-          if (u.Rarity === 'Rare') aerialRare.innerHTML += `<option>${u.Unit}</option>`;
-        } else if (u.Faction === 'UR') {
-          if (u.Rarity === 'Common') urCommon.innerHTML += `<option>${u.Unit}</option>`;
-          if (u.Rarity === 'Rare') urRare.innerHTML += `<option>${u.Unit}</option>`;
-        } else {
-          if (u.Rarity === 'Common') common.innerHTML += `<option>${u.Unit}</option>`;
-          if (u.Rarity === 'Rare') rare.innerHTML += `<option>${u.Unit}</option>`;
-        }
+      unitsData.filter(u => u.Faction === faction).forEach(u => {
+        const option = document.createElement('option');
+        option.value = u.Unit;
+        option.textContent = u.Unit;
+        if (u.Type === 'Aerial' && u.Rarity === 'Common') aerialCommonSelect.appendChild(option);
+        else if (u.Type === 'Aerial' && u.Rarity === 'Rare') aerialRareSelect.appendChild(option);
+        else if (u.Rarity === 'Common' && u.Faction === faction && !u.Unit.includes('UR')) commonSelect.appendChild(option);
+        else if (u.Rarity === 'Rare' && u.Faction === faction && !u.Unit.includes('UR')) rareSelect.appendChild(option);
+        else if (u.Unit.includes('UR') && u.Rarity === 'Common') urCommonSelect.appendChild(option);
+        else if (u.Unit.includes('UR') && u.Rarity === 'Rare') urRareSelect.appendChild(option);
       });
     }
 
     function setPointLimit(limit) {
       document.querySelectorAll('#point-buttons .btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelector(`#point-buttons .btn:nth-child(${limit/300})`).classList.add('active');
+      document.querySelector(`#point-buttons .btn:nth-child(${[300,600,900,1200].indexOf(limit)+1})`).classList.add('active');
       document.getElementById('selected-limit').textContent = `Selected Point Limit: ${limit}`;
     }
 
     function exportToPDF() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
-      doc.text('Army List', 10, 10);
-      doc.save('army-list.pdf');
+      doc.text("MaK Army Builder Export", 10, 10);
+      doc.save("army_list.pdf");
     }
   </script>
 </body>
