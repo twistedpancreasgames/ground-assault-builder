@@ -21,8 +21,6 @@
         <label for="faction" class="form-label">Faction</label>
         <select id="faction" class="form-select">
           <option value="" disabled selected>Choose Army</option>
-          <option value="IMA">IMA</option>
-          <option value="SDR">SDR</option>
         </select>
       </div>
       <div class="col-md-6">
@@ -38,34 +36,22 @@
     </div>
 
     <h4>Ground Units (Common)</h4>
-    <select class="form-select mb-3" id="common-units">
-      <option value="" disabled selected>Select a Unit</option>
-    </select>
+    <select class="form-select mb-3" id="common-units"></select>
 
     <h4>Ground Units (Rare)</h4>
-    <select class="form-select mb-3" id="rare-units">
-      <option value="" disabled selected>Select a Unit</option>
-    </select>
+    <select class="form-select mb-3" id="rare-units"></select>
 
     <h4>UR Ground Units (Common)</h4>
-    <select class="form-select mb-3" id="ur-common-units">
-      <option value="" disabled selected>Select a Unit</option>
-    </select>
+    <select class="form-select mb-3" id="ur-common-units"></select>
 
     <h4>UR Ground Units (Rare)</h4>
-    <select class="form-select mb-3" id="ur-rare-units">
-      <option value="" disabled selected>Select a Unit</option>
-    </select>
+    <select class="form-select mb-3" id="ur-rare-units"></select>
 
     <h4>Aerial Units (Common)</h4>
-    <select class="form-select mb-3" id="aerial-common-units">
-      <option value="" disabled selected>Select a Unit</option>
-    </select>
+    <select class="form-select mb-3" id="aerial-common-units"></select>
 
     <h4>Aerial Units (Rare)</h4>
-    <select class="form-select mb-3" id="aerial-rare-units">
-      <option value="" disabled selected>Select a Unit</option>
-    </select>
+    <select class="form-select mb-3" id="aerial-rare-units"></select>
 
     <h4>Army List</h4>
     <table class="table table-striped">
@@ -83,50 +69,59 @@
 
   <script>
     const sheetUrl = 'https://docs.google.com/spreadsheets/d/1fofK8kEvGMV7-ZGSWdJHExhFU0iBBaE3XpzNSucHlpg/gviz/tq?tqx=out:csv';
-    let units = [];
+    let unitData = [];
 
     Papa.parse(sheetUrl, {
       download: true,
       header: true,
       complete: function(results) {
-        units = results.data;
-        populateDropdowns();
+        unitData = results.data;
+        populateFactionDropdown();
       }
     });
 
-    function populateDropdowns() {
-      const factions = [...new Set(units.map(u => u.Faction).filter(f => f))];
+    function populateFactionDropdown() {
+      const factions = [...new Set(unitData.map(u => u.Faction).filter(Boolean))];
       const factionSelect = document.getElementById('faction');
-      factions.forEach(f => {
-        const opt = document.createElement('option');
-        opt.value = f;
-        opt.textContent = f;
+      factions.forEach(faction => {
+        let opt = document.createElement('option');
+        opt.value = faction;
+        opt.textContent = faction;
         factionSelect.appendChild(opt);
       });
 
-      // Populate based on type
-      populateSelect('common-units', u => u.Rarity === 'Common' && u.Category === 'Ground');
-      populateSelect('rare-units', u => u.Rarity === 'Rare' && u.Category === 'Ground');
-      populateSelect('ur-common-units', u => u.Rarity === 'Common' && u.Category === 'UR Ground');
-      populateSelect('ur-rare-units', u => u.Rarity === 'Rare' && u.Category === 'UR Ground');
-      populateSelect('aerial-common-units', u => u.Rarity === 'Common' && u.Category === 'Aerial');
-      populateSelect('aerial-rare-units', u => u.Rarity === 'Rare' && u.Category === 'Aerial');
+      factionSelect.addEventListener('change', () => {
+        populateUnitDropdowns(factionSelect.value);
+      });
     }
 
-    function populateSelect(id, filterFn) {
-      const select = document.getElementById(id);
-      units.filter(filterFn).forEach(u => {
-        const opt = document.createElement('option');
-        opt.value = u.Unit;
-        opt.textContent = u.Unit;
-        select.appendChild(opt);
+    function populateUnitDropdowns(faction) {
+      const common = document.getElementById('common-units');
+      const rare = document.getElementById('rare-units');
+      const urCommon = document.getElementById('ur-common-units');
+      const urRare = document.getElementById('ur-rare-units');
+      const aerialCommon = document.getElementById('aerial-common-units');
+      const aerialRare = document.getElementById('aerial-rare-units');
+
+      [common, rare, urCommon, urRare, aerialCommon, aerialRare].forEach(sel => sel.innerHTML = '<option disabled selected>Select a Unit</option>');
+
+      unitData.filter(u => u.Faction === faction || u.Faction === 'UR').forEach(u => {
+        if (u.Type === 'Aerial') {
+          if (u.Rarity === 'Common') aerialCommon.innerHTML += `<option>${u.Unit}</option>`;
+          if (u.Rarity === 'Rare') aerialRare.innerHTML += `<option>${u.Unit}</option>`;
+        } else if (u.Faction === 'UR') {
+          if (u.Rarity === 'Common') urCommon.innerHTML += `<option>${u.Unit}</option>`;
+          if (u.Rarity === 'Rare') urRare.innerHTML += `<option>${u.Unit}</option>`;
+        } else {
+          if (u.Rarity === 'Common') common.innerHTML += `<option>${u.Unit}</option>`;
+          if (u.Rarity === 'Rare') rare.innerHTML += `<option>${u.Unit}</option>`;
+        }
       });
     }
 
     function setPointLimit(limit) {
       document.querySelectorAll('#point-buttons .btn').forEach(btn => btn.classList.remove('active'));
-      const btn = Array.from(document.querySelectorAll('#point-buttons .btn')).find(b => b.textContent == limit);
-      if (btn) btn.classList.add('active');
+      document.querySelector(`#point-buttons .btn:nth-child(${limit/300})`).classList.add('active');
       document.getElementById('selected-limit').textContent = `Selected Point Limit: ${limit}`;
     }
 
@@ -134,13 +129,7 @@
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
       doc.text('Army List', 10, 10);
-      let y = 20;
-      document.querySelectorAll('#army-list-body tr').forEach(row => {
-        const cols = Array.from(row.querySelectorAll('td')).map(td => td.innerText).join(' | ');
-        doc.text(cols, 10, y);
-        y += 10;
-      });
-      doc.save('army_list.pdf');
+      doc.save('army-list.pdf');
     }
   </script>
 </body>
