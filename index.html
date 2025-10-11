@@ -19,13 +19,13 @@
 
     <style>
         /*
-        The header background images have been embedded directly into the CSS.
-        This ensures the application remains a single, easy-to-share file.
+        The header background images are now loaded from external links
+        as requested to ensure they always appear correctly.
         */
         :root {
-            --header-default: url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwMDAwYEBAMFBwYHBwcGBwcICQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/2wBDAQICAgMDAwYDAwYMCAcIDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAz/wAARCAAlAPADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1VXVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX9jZ2uLj5OXm5+jp6vLz9PX29/j5+v/aAAwDAQACEQMRAD8A/v4ooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA/9k=');
-            --header-ima: url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwMDAwYEBAMFBwYHBwcGBwcICQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/2wBDAQICAgMDAwYDAwYMCAcIDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAz/wAARCAAmAPADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1VXVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX9jZ2uLj5OXm5+jp6vLz9PX29/j5+v/aAAwDAQACEQMRAD8A/v4ooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA/9k=');
-            --header-sdr: url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwMDAwYEBAMFBwYHBwcGBwcICQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/wBDAQICAgMDAwYDAwYMCAcIDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAz/wAARCAAmAPADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1VXVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX9jZ2uLj5OXm5+jp6vLz9PX29/j5+v/aAAwDAQACEQMRAD8A/v4ooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA/9k=');
+            --header-default: url('https://i.imgur.com/5epAAh9.jpeg');
+            --header-ima: url('https://i.imgur.com/efgRqbr.jpeg');
+            --header-sdr: url('https://i.imgur.com/oVbGysC.jpeg');
         }
 
         /* Custom styles for the new theme */
@@ -95,7 +95,8 @@
             font-family: 'Manrope', sans-serif;
             font-weight: 800;
             text-transform: capitalize;
-            @apply px-4 py-3 text-left text-sm;
+            text-align: left; /* Explicitly align text to the left */
+            @apply px-4 py-3 text-sm;
         }
         .table td {
              @apply px-4 py-3 text-left text-sm;
@@ -104,7 +105,7 @@
             background-color: rgba(79, 94, 106, 0.05);
         }
         #validation-messages {
-            @apply list-disc list-inside text-red-700 mt-4 p-4 bg-red-100/80 border border-red-500 rounded-md;
+            @apply list-disc list-inside text-red-800 font-bold mt-4 p-4 border-2 border-red-600 rounded-lg bg-red-100;
         }
         .loader {
             border: 4px solid #f3f3f3;
@@ -122,9 +123,9 @@
 </head>
 <body class="antialiased">
 
-    <header id="page-header" class="text-center mb-8 shadow-lg">
-        <h1 class="font-league-gothic text-5xl md:text-7xl font-bold tracking-wider uppercase text-shadow">MaK in 15mm Army Builder</h1>
-        <p class="font-bold text-sm">V0.5 - Final Design</p>
+    <header id="page-header" class="text-center mb-8 shadow-lg h-20 flex items-center justify-center">
+        <h1 class="sr-only">MaK in 15mm Army Builder</h1>
+        <p class="sr-only">V0.7 - Final Polish</p>
     </header>
 
     <div class="container mx-auto p-4 md:p-8 max-w-7xl">
@@ -220,6 +221,12 @@
         
         let unitData = []; // This will be populated from Google Sheets
 
+        // --- STATIC ASSETS ---
+        const factionImagesBase64 = {
+            IMA: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwMDAwYEBAMFBwYHBwcGBwcICQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/2wBDAQICAgMDAwYDAwYMCAcIDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAz/wAARCAAmAPADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1VXVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX9jZ2uLj5OXm5+jp6vLz9PX29/j5+v/aAAwDAQACEQMRAD8A/v4ooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA/9k=',
+            SDR: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwMDAwYEBAMFBwYHBwcGBwcICQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/wBDAQICAgMDAwYDAwYMCAcIDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAz/wAARCAAmAPADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1VXVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX9jZ2uLj5OXm5+jp6vLz9PX2+9/j5+v/aAAwDAQACEQMRAD8A/v4ooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA/9k='
+        };
+
         // --- STATE MANAGEMENT ---
         let armyList = [];
         let selectedFaction = null;
@@ -255,28 +262,24 @@
         }
 
         function csvToJson(csv) {
-            // Sanitize line endings (\r) and filter out empty lines
             const lines = csv.replace(/\r/g, '').split('\n').filter(line => line.trim() !== '');
             const result = [];
-            if (lines.length < 2) return result; // Exit if no data rows
+            if (lines.length < 2) return result; 
 
             const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
 
             for (let i = 1; i < lines.length; i++) {
                 const obj = {};
-                // Use a simpler split for CSV rows, which is more robust for this data
                 const currentline = lines[i].split(',');
                 
-                // Skip rows that don't have the same number of columns as the header
                 if (currentline.length !== headers.length) {
-                    console.warn(`Skipping malformed CSV row ${i + 1}. Expected ${headers.length} columns, but got ${currentline.length}.`, lines[i]);
+                    console.warn(`Skipping malformed CSV row ${i + 1}.`, lines[i]);
                     continue;
                 }
 
                 headers.forEach((header, index) => {
                     let value = currentline[index] ? currentline[index].trim().replace(/"/g, '') : '';
                     if (header === 'Cost' || header === 'Wounds') {
-                        // Ensure that parsed numbers are valid, default to 0 if not
                         value = parseInt(value, 10) || 0;
                     }
                     obj[header] = value;
@@ -285,7 +288,6 @@
             }
             return result;
         }
-
 
         async function loadUnitData() {
             dataStatusEl.innerHTML = `<div class="flex justify-center items-center gap-3"><div class="loader"></div><p>Loading unit data from Google Sheet...</p></div>`;
@@ -385,7 +387,7 @@
 
             const newUnit = {
                 ...unitTemplate,
-                id: Date.now() + Math.random(), // Unique ID for each instance
+                id: Date.now() + Math.random(),
                 training: 'Regular',
                 hasCommand: false,
                 hasPanzerfaust: false,
@@ -415,7 +417,6 @@
 
         function render() {
             armyListBody.innerHTML = '';
-            
             emptyListMessage.style.display = armyList.length === 0 ? 'table-row' : 'none';
             
             armyList.forEach(unit => {
@@ -456,7 +457,6 @@
             const totalPoints = armyList.reduce((acc, unit) => acc + calculateUnitCost(unit), 0);
             totalPointsEl.textContent = totalPoints;
             limitPointsEl.textContent = pointsLimit;
-            
             totalPointsEl.classList.toggle('text-green-700', totalPoints <= pointsLimit);
             totalPointsEl.classList.toggle('text-red-600', totalPoints > pointsLimit);
             
@@ -469,12 +469,11 @@
             }
         }
 
-        // --- VALIDATION ENGINE ---
         function validateArmy() {
             let errors = [];
             const multiplier = pointsLimit / 600;
-
             const totalPoints = armyList.reduce((acc, unit) => acc + calculateUnitCost(unit), 0);
+
             if (totalPoints > pointsLimit) {
                 errors.push({ message: `Total points (${totalPoints}) exceed the limit of ${pointsLimit}.`, isFatal: true });
             }
@@ -484,7 +483,7 @@
                 errors.push({ message: `Too many units (${armyList.length}). Maximum is ${maxUnits} for a ${pointsLimit}pt army.`, isFatal: true });
             }
 
-            const minSuits = Math.ceil(pointsLimit / 600) * 3;
+            const minSuits = Math.ceil(multiplier) * 3;
             const suitCount = armyList.filter(u => u.Type === 'Suit').length;
             if (suitCount < minSuits) {
                 errors.push({ message: `Not enough Suits (${suitCount}). You need at least ${minSuits} for a ${pointsLimit}pt army.` });
@@ -499,11 +498,11 @@
             armyList.filter(u => u.Support).forEach(supportUnit => {
                 const parentUnits = armyList.filter(u => u.Name === supportUnit.Support);
                 if (parentUnits.length === 0) {
-                     errors.push({ message: `Support unit "${supportUnit.Name}" requires a parent "${supportUnit.Support}" unit, which is not in the list.`, isFatal: true });
+                     errors.push({ message: `Support unit "${supportUnit.Name}" requires a parent "${supportUnit.Support}" unit.`, isFatal: true });
                 }
                 const siblingSupportUnits = armyList.filter(u => u.Support === supportUnit.Support);
                 if(siblingSupportUnits.length > parentUnits.length){
-                     errors.push({ message: `Too many "${supportUnit.Name}" support units. Ratio to parent "${supportUnit.Support}" cannot exceed 1:1.` });
+                     errors.push({ message: `Too many "${supportUnit.Name}" support units. Ratio to parent "${supportUnit.Support}" is 1:1.` });
                 }
             });
             
@@ -535,7 +534,7 @@
             const maxCommand = 1 * multiplier;
             const commandCount = armyList.filter(u => u.hasCommand).length;
             if (commandCount > maxCommand) {
-                errors.push({ message: `Too many Command units (${commandCount}). Maximum is ${maxCommand}.` });
+                errors.push({ message: `Too many Command upgrades (${commandCount}). Maximum is ${maxCommand}.` });
             }
 
             const maxHeroes = 1 * multiplier;
@@ -550,12 +549,31 @@
             if (fdUnits.length > 0) {
                  const fdPointLimit = totalPoints * 0.20;
                  if (fdPoints > fdPointLimit && fdUnits.length > maxFdUnits) {
-                      errors.push({ message: `Forward Deployment points (${fdPoints}) exceed 20% of total army cost and you have more than ${maxFdUnits} units.` });
+                      errors.push({ message: `Forward Deployment points (${fdPoints}) exceed 20% of total and you have more than ${maxFdUnits} units.` });
                  } else if (fdPoints > fdPointLimit) {
-                      errors.push({ message: `Forward Deployment points (${fdPoints}) cannot exceed 20% of total army cost (${fdPointLimit.toFixed(0)}).` });
+                      errors.push({ message: `Forward Deployment points (${fdPoints}) cannot exceed 20% of total (${fdPointLimit.toFixed(0)}).` });
                  } else if (fdUnits.length > maxFdUnits) {
                       errors.push({ message: `Cannot have more than ${maxFdUnits} Forward Deployment units.` });
                  }
+            }
+            
+            // --- NEW RULES ---
+            const maxCaptured = 1 * multiplier;
+            const capturedCount = armyList.filter(u => u.Name.toLowerCase().includes('captured')).length;
+            if (capturedCount > maxCaptured) {
+                errors.push({ message: `Too many Captured units (${capturedCount}). Maximum is ${maxCaptured}.` });
+            }
+
+            const commandKeywordCount = armyList.filter(u => u.Name.toLowerCase().includes('command')).length;
+            if (commandKeywordCount > maxCommand) {
+                 errors.push({ message: `Too many units with 'Command' in their name (${commandKeywordCount}). Maximum is ${maxCommand}.` });
+            }
+
+            const maxAerialPoints = 120 * multiplier;
+            const aerialUnits = armyList.filter(u => u.Mobility === 'Aerial');
+            const aerialPoints = aerialUnits.reduce((acc, unit) => acc + calculateUnitCost(unit), 0);
+            if (aerialPoints > maxAerialPoints) {
+                errors.push({ message: `Total points for Aerial units (${aerialPoints}) exceed the limit of ${maxAerialPoints}.` });
             }
             
             return errors;
@@ -564,13 +582,9 @@
         // --- EVENT HANDLERS ---
         function handleFactionChange(e) {
             selectedFaction = e.target.value;
-            // Update header style based on faction
             pageHeader.classList.remove('header-ima', 'header-sdr');
-            if (selectedFaction === 'IMA') {
-                pageHeader.classList.add('header-ima');
-            } else if (selectedFaction === 'SDR') {
-                pageHeader.classList.add('header-sdr');
-            }
+            if (selectedFaction === 'IMA') pageHeader.classList.add('header-ima');
+            else if (selectedFaction === 'SDR') pageHeader.classList.add('header-sdr');
             resetArmy();
             populateDropdowns();
         }
@@ -603,25 +617,51 @@
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(18);
             doc.text('MaK in 15mm Army Roster', 105, 15, { align: 'center' });
+
+            const factionImageData = factionImagesBase64[selectedFaction];
+            let infoY = 25; // Y position for info text like Faction, Points
+
+            if (factionImageData) {
+                // Image dimensions: The original is approx 12.3:1 ratio
+                const imgWidth = 140; // width in mm for the PDF
+                const imgHeight = imgWidth / 12.3;
+                const imgX = (doc.internal.pageSize.getWidth() - imgWidth) / 2; // Center the image
+                doc.addImage(factionImageData, 'JPEG', imgX, 20, imgWidth, imgHeight);
+                infoY = 25 + imgHeight; // Move text down to be below the image
+            }
+
             doc.setFontSize(12);
             doc.setFont('helvetica', 'normal');
-            doc.text(`Faction: ${selectedFaction || 'N/A'}`, 14, 25);
-            doc.text(`Point Limit: ${pointsLimit}`, 105, 25, { align: 'center' });
+            doc.text(`Faction: ${selectedFaction || 'N/A'}`, 14, infoY);
+            doc.text(`Point Limit: ${pointsLimit}`, 105, infoY, { align: 'center' });
             const totalPoints = armyList.reduce((acc, unit) => acc + calculateUnitCost(unit), 0);
-            doc.text(`Total Points: ${totalPoints}`, 196, 25, { align: 'right' });
+            doc.text(`Total Points: ${totalPoints}`, 196, infoY, { align: 'right' });
 
             const tableData = armyList.map(unit => {
-                const modifications = [unit.training !== 'Regular' ? unit.training : '', unit.hasCommand ? 'Command' : '', unit.hasPanzerfaust ? 'Panzerfaust' : ''].filter(Boolean).join(', ') || '-';
-                return [unit.Name, unit.Type, unit.Rarity, modifications, calculateUnitCost(unit)];
+                const isHero = unit.Name.toLowerCase().includes('hero');
+                const hasCommandKeyword = unit.Name.toLowerCase().includes('command');
+                const canHavePanzerfaust = ['Suit', 'Infantry'].includes(unit.Type);
+                const trainingText = isHero ? 'Elite' : unit.training;
+                const commandText = hasCommandKeyword ? 'Inherent' : (unit.hasCommand ? 'Yes' : 'No');
+                const panzerfaustText = canHavePanzerfaust ? (unit.hasPanzerfaust ? 'Yes' : 'No') : 'N/A';
+                
+                return [
+                    unit.Name,
+                    unit.Rarity,
+                    trainingText,
+                    commandText,
+                    panzerfaustText,
+                    calculateUnitCost(unit)
+                ];
             });
 
             doc.autoTable({
-                head: [['Unit', 'Type', 'Rarity', 'Upgrades', 'Cost']],
+                head: [['Unit', 'Rarity', 'Training', 'Command', 'Panzerfaust', 'Cost']],
                 body: tableData,
-                startY: 30,
+                startY: infoY + 5,
                 theme: 'grid',
-                headStyles: { fillColor: [79, 94, 106] },
-                styles: { font: 'helvetica', fontSize: 10 },
+                headStyles: { fillColor: [79, 94, 106], halign: 'left' },
+                styles: { font: 'helvetica', fontSize: 10, cellPadding: 2, halign: 'left' },
             });
 
             doc.save(`MaK_Army_List_${selectedFaction}_${pointsLimit}pts.pdf`);
