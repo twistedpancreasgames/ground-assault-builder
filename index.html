@@ -1,320 +1,635 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MaK Army Builder V1.2</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-  <style>
-    body { padding: 2rem; }
-    .unit-table th, .unit-table td { vertical-align: middle; }
-    .btn-group .btn.active { background-color: #0d6efd; color: white; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MaK in 15mm Army Builder</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- jsPDF for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Manrope:wght@400;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /*
+        The header background images have been embedded directly into the CSS.
+        This ensures the application remains a single, easy-to-share file.
+        */
+        :root {
+            --header-default: url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwMDAwYEBAMFBwYHBwcGBwcICQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/2wBDAQICAgMDAwYDAwYMCAcIDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAz/wAARCAAlAPADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1VXVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX9jZ2uLj5OXm5+jp6vLz9PX29/j5+v/aAAwDAQACEQMRAD8A/v4ooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA/9k=');
+            --header-ima: url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwMDAwYEBAMFBwYHBwcGBwcICQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/2wBDAQICAgMDAwYDAwYMCAcIDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAz/wAARCAAmAPADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1VXVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX9jZ2uLj5OXm5+jp6vLz9PX29/j5+v/aAAwDAQACEQMRAD8A/v4ooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA/9k=');
+            --header-sdr: url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwMDAwYEBAMFBwYHBwcGBwcICQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/wBDAQICAgMDAwYDAwYMCAcIDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAz/wAARCAAmAPADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1VXVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX9jZ2uLj5OXm5+jp6vLz9PX29/j5+v/aAAwDAQACEQMRAD8A/v4ooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA/9k=');
+        }
+
+        /* Custom styles for the new theme */
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: #F0F0F0;
+            color: #333333;
+        }
+        #page-header {
+            background-image: var(--header-default);
+            background-size: cover;
+            background-position: center;
+            padding: 1rem;
+            color: white;
+            transition: background-image 0.5s ease-in-out;
+        }
+        #page-header.header-ima {
+            background-image: var(--header-ima);
+        }
+        #page-header.header-sdr {
+            background-image: var(--header-sdr);
+        }
+        .section-heading {
+             font-family: 'Manrope', sans-serif;
+             font-weight: 800;
+             text-transform: uppercase;
+             color: #4F5E6A;
+             margin-bottom: 0.5rem;
+             font-size: 1rem;
+        }
+        .btn {
+            @apply px-4 py-2 rounded-md shadow-sm transition-all duration-200 ease-in-out text-sm font-bold border;
+        }
+        .btn-primary {
+            @apply bg-[#AC2436] hover:bg-[#8e1c2b] text-white border-transparent;
+        }
+        .btn-toggle-active {
+            @apply bg-green-600 text-white border-transparent ring-2 ring-offset-2 ring-offset-white ring-green-600;
+        }
+        .btn-toggle-inactive {
+             @apply bg-gray-200/70 text-gray-500 border-gray-400/50;
+        }
+        .points-btn {
+             @apply bg-white hover:bg-gray-200 text-[#4F5E6A] border-2 border-[#B89248];
+        }
+        .points-btn.btn-active {
+            background-color: #D6B371;
+            border-color: #B89248;
+            color: #403624;
+            font-weight: bold;
+        }
+        select, .table-select {
+            background-color: #D6B371;
+            border: 2px solid #B89248;
+            color: #403624;
+            font-weight: bold;
+            @apply w-full rounded-md py-2 px-3 focus:ring-2 focus:ring-offset-2 focus:ring-[#B89248] focus:border-[#B89248];
+        }
+        option {
+            background-color: white;
+            color: #333;
+        }
+        .table th {
+            background-color: #D6B371;
+            border: 2px solid #B89248;
+            color: #403624;
+            font-family: 'Manrope', sans-serif;
+            font-weight: 800;
+            text-transform: capitalize;
+            @apply px-4 py-3 text-left text-sm;
+        }
+        .table td {
+             @apply px-4 py-3 text-left text-sm;
+        }
+        .table tr:nth-child(even) {
+            background-color: rgba(79, 94, 106, 0.05);
+        }
+        #validation-messages {
+            @apply list-disc list-inside text-red-700 mt-4 p-4 bg-red-100/80 border border-red-500 rounded-md;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #AC2436;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
-<body>
-  <div class="container">
-    <h2 class="mb-4">MaK Army Builder V1.2</h2>
-    <div class="row mb-3">
-      <div class="col-md-6">
-        <label for="faction" class="form-label">Faction</label>
-        <select id="faction" class="form-select">
-          <option value="" disabled selected>Choose Army</option>
-        </select>
-      </div>
-      <div class="col-md-6">
-        <label class="form-label">Point Limit</label><br />
-        <div class="btn-group" role="group" id="point-buttons">
-          <button type="button" class="btn btn-outline-primary" onclick="setPointLimit(300)">300</button>
-          <button type="button" class="btn btn-outline-primary active" onclick="setPointLimit(600)">600</button>
-          <button type="button" class="btn btn-outline-primary" onclick="setPointLimit(900)">900</button>
-          <button type="button" class="btn btn-outline-primary" onclick="setPointLimit(1200)">1200</button>
-        </div>
-        <div id="selected-limit" class="mt-2 fw-bold">Selected Point Limit: 600</div>
-      </div>
+<body class="antialiased">
+
+    <header id="page-header" class="text-center mb-8 shadow-lg">
+        <h1 class="font-league-gothic text-5xl md:text-7xl font-bold tracking-wider uppercase text-shadow">MaK in 15mm Army Builder</h1>
+        <p class="font-bold text-sm">V0.5 - Final Design</p>
+    </header>
+
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+        <main class="space-y-6">
+            <!-- Army Setup Section -->
+            <section>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                    <div>
+                        <h2 class="section-heading">Faction</h2>
+                        <select id="faction-select">
+                            <option value="">Choose Faction</option>
+                            <option value="IMA">IMA</option>
+                            <option value="SDR">SDR</option>
+                        </select>
+                    </div>
+                    <div>
+                        <h2 class="section-heading">Point Limit</h2>
+                        <div id="points-container" class="flex flex-wrap gap-2">
+                            <button class="btn points-btn" data-points="300">300</button>
+                            <button class="btn points-btn" data-points="600">600</button>
+                            <button class="btn points-btn" data-points="900">900</button>
+                            <button class="btn points-btn" data-points="1200">1200</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Unit Selection Section -->
+            <section id="unit-selection-section" class="hidden">
+                 <h2 class="section-heading">Unit Deployment</h2>
+                 <div id="data-status" class="text-center p-4">
+                    <!-- Loading/Error messages will go here -->
+                 </div>
+                 <div id="dropdown-container" class="flex flex-col gap-4 hidden">
+                     <!-- Unit Dropdowns will be populated here by JS -->
+                 </div>
+            </section>
+            
+            <!-- Validation Messages -->
+            <section id="validation-section" class="hidden">
+                 <ul id="validation-messages"></ul>
+            </section>
+            
+            <!-- Army List Section -->
+            <section>
+                <div class="flex flex-col md:flex-row justify-between items-start mb-2">
+                    <h2 class="section-heading">Army Roster</h2>
+                    <div class="text-left mt-2 md:mt-0">
+                        <span class="section-heading">TOTAL: </span>
+                        <span id="total-points" class="font-bold text-2xl text-green-700">0</span>
+                        <span class="text-xl"> / </span>
+                        <span id="limit-points" class="text-xl text-gray-500">600</span>
+                    </div>
+                </div>
+                <div class="overflow-x-auto bg-white rounded-md shadow">
+                    <table class="w-full table min-w-[800px]">
+                        <thead>
+                            <tr>
+                                <th>Unit</th>
+                                <th>Rarity</th>
+                                <th>Training</th>
+                                <th>Command</th>
+                                <th>Panzerfaust</th>
+                                <th>Cost</th>
+                                <th>Remove</th>
+                            </tr>
+                        </thead>
+                        <tbody id="army-list">
+                           <!-- Army list rows will be added here -->
+                        </tbody>
+                    </table>
+                     <div id="empty-list-message" class="text-center py-8 text-gray-500">
+                        Your army list is empty. Select a faction to begin.
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Export Button -->
+            <section class="text-center mt-8">
+                <button id="export-pdf" class="btn btn-primary w-full md:w-auto">Export to PDF</button>
+            </section>
+
+        </main>
     </div>
 
-    <h4>Ground Units (Common)</h4>
-    <select class="form-select mb-3" id="common-units">
-      <option value="" disabled selected>Select a Unit</option>
-    </select>
+    <script type="module">
+        const { jsPDF } = window.jspdf;
 
-    <h4>Ground Units (Rare)</h4>
-    <select class="form-select mb-3" id="rare-units">
-      <option value="" disabled selected>Select a Unit</option>
-    </select>
+        // --- DATA SOURCE ---
+        const GOOGLE_SHEET_ID = '1fofK8kEvGMV7-ZGSWdJHExhFU0iBBaE3XpzNSucHlpg';
+        const GOOGLE_SHEET_GID = '0'; // '0' is usually the first sheet. Change if you use a different one.
+        const GOOGLE_SHEET_URL = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/export?format=csv&gid=${GOOGLE_SHEET_GID}`;
+        
+        let unitData = []; // This will be populated from Google Sheets
 
-    <h4>UR Ground Units (Common)</h4>
-    <select class="form-select mb-3" id="ur-common-units">
-      <option value="" disabled selected>Select a Unit</option>
-    </select>
+        // --- STATE MANAGEMENT ---
+        let armyList = [];
+        let selectedFaction = null;
+        let pointsLimit = 600;
 
-    <h4>UR Ground Units (Rare)</h4>
-    <select class="form-select mb-3" id="ur-rare-units">
-      <option value="" disabled selected>Select a Unit</option>
-    </select>
+        // --- DOM ELEMENTS ---
+        const pageHeader = document.getElementById('page-header');
+        const factionSelect = document.getElementById('faction-select');
+        const pointsContainer = document.getElementById('points-container');
+        const dropdownContainer = document.getElementById('dropdown-container');
+        const armyListBody = document.getElementById('army-list');
+        const totalPointsEl = document.getElementById('total-points');
+        const limitPointsEl = document.getElementById('limit-points');
+        const unitSelectionSection = document.getElementById('unit-selection-section');
+        const emptyListMessage = document.getElementById('empty-list-message');
+        const validationSection = document.getElementById('validation-section');
+        const validationMessagesEl = document.getElementById('validation-messages');
+        const exportPdfBtn = document.getElementById('export-pdf');
+        const dataStatusEl = document.getElementById('data-status');
 
-    <h4>Army List</h4>
-    <table class="table table-striped">
-      <thead>
-        <tr><th>Unit</th><th>Rarity</th><th>Panzerfaust</th><th>Command</th><th>Training</th><th>Cost</th><th></th></tr>
-      </thead>
-      <tbody id="army-list-body"></tbody>
-      <tfoot>
-        <tr><td><strong>Total:</strong></td><td id="total-cost">0</td><td></td><td></td></tr>
-      </tfoot>
-    </table>
+        // --- CORE FUNCTIONS ---
+        async function initialize() {
+            // Set initial active button
+            const initialPointsBtn = document.querySelector(`#points-container button[data-points="${pointsLimit}"]`);
+            if (initialPointsBtn) initialPointsBtn.classList.add('btn-active');
+            
+            factionSelect.addEventListener('change', handleFactionChange);
+            pointsContainer.addEventListener('click', handlePointsChange);
+            exportPdfBtn.addEventListener('click', exportPDF);
+            
+            await loadUnitData();
+            render();
+        }
 
-    <button class="btn btn-dark" onclick="exportToPDF()">Export to PDF</button>
-  </div>
+        function csvToJson(csv) {
+            // Sanitize line endings (\r) and filter out empty lines
+            const lines = csv.replace(/\r/g, '').split('\n').filter(line => line.trim() !== '');
+            const result = [];
+            if (lines.length < 2) return result; // Exit if no data rows
 
-  <script>
-    const SHEET_URL = "https://docs.google.com/spreadsheets/d/1fofK8kEvGMV7-ZGSWdJHExhFU0iBBaE3XpzNSucHlpg/gviz/tq?tqx=out:csv";
+            const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
 
-    let allUnits = [];
-    let filteredUnits = [];
-    let armyList = [];
-    let currentFaction = "";
-    let pointLimit = 600;
+            for (let i = 1; i < lines.length; i++) {
+                const obj = {};
+                // Use a simpler split for CSV rows, which is more robust for this data
+                const currentline = lines[i].split(',');
+                
+                // Skip rows that don't have the same number of columns as the header
+                if (currentline.length !== headers.length) {
+                    console.warn(`Skipping malformed CSV row ${i + 1}. Expected ${headers.length} columns, but got ${currentline.length}.`, lines[i]);
+                    continue;
+                }
 
-    async function fetchUnits() {
-      const res = await fetch(SHEET_URL);
-      const csv = await res.text();
+                headers.forEach((header, index) => {
+                    let value = currentline[index] ? currentline[index].trim().replace(/"/g, '') : '';
+                    if (header === 'Cost' || header === 'Wounds') {
+                        // Ensure that parsed numbers are valid, default to 0 if not
+                        value = parseInt(value, 10) || 0;
+                    }
+                    obj[header] = value;
+                });
+                result.push(obj);
+            }
+            return result;
+        }
 
-      Papa.parse(csv, {
-        header: true,
-        skipEmptyLines: true,
-        complete: function(results) {
-          allUnits = results.data
-            .map(unit => ({
-              Name: unit.Name,
-              Cost: parseInt(unit.Cost),
-              Type: unit.Type,
-              Rarity: unit.Rarity,
-              Faction: unit.Faction,
-              Wound: parseInt(unit.Wound) || 0
-            }))
-            .filter(unit => unit.Name && unit.Faction && !isNaN(unit.Cost));
 
-          const factions = [...new Set(allUnits.map(u => u.Faction).filter(f => f !== "UR"))];
-          const select = document.getElementById("faction");
-          select.innerHTML = '<option value="" disabled selected>Choose Army</option>';
-          factions.forEach(f => {
-            const option = document.createElement("option");
-            option.value = f;
-            option.textContent = f;
-            select.appendChild(option);
-          });
+        async function loadUnitData() {
+            dataStatusEl.innerHTML = `<div class="flex justify-center items-center gap-3"><div class="loader"></div><p>Loading unit data from Google Sheet...</p></div>`;
+            try {
+                const response = await fetch(GOOGLE_SHEET_URL);
+                if (!response.ok) throw new Error(`Network response was not ok: ${response.statusText}`);
+                
+                const csvData = await response.text();
+                unitData = csvToJson(csvData);
 
-          select.addEventListener("change", e => {
-            currentFaction = e.target.value;
+                if(unitData.length === 0) throw new Error('No data found or failed to parse. Ensure the Google Sheet is published and not empty.');
+                
+                dataStatusEl.innerHTML = '';
+                dropdownContainer.classList.remove('hidden');
+            } catch (error) {
+                console.error('Failed to load unit data:', error);
+                dataStatusEl.innerHTML = `<p class="text-red-600 font-bold">Error loading unit data. Please ensure you have followed the 'Publish to web' instructions for your Google Sheet.</p>`;
+                dropdownContainer.classList.add('hidden');
+            }
+        }
+
+        function resetArmy() {
             armyList = [];
             render();
-          });
-        },
-        error: function(err) {
-          alert("Failed to load unit data. Please check your sheet.");
-          console.error("CSV Parse Error", err);
         }
-      });
-    }
 
-    function setPointLimit(limit) {
-      pointLimit = limit;
-      document.getElementById("selected-limit").innerText = `Selected Point Limit: ${limit}`;
-      document.querySelectorAll("#point-buttons .btn").forEach(btn => {
-        btn.classList.remove("active");
-        if (btn.textContent == limit.toString()) btn.classList.add("active");
-      });
-      render();
-    }
+        function populateDropdowns() {
+            dropdownContainer.innerHTML = '';
+            if (!selectedFaction || unitData.length === 0) {
+                unitSelectionSection.classList.add('hidden');
+                return;
+            }
+            unitSelectionSection.classList.remove('hidden');
 
-    function render() {
-      filteredUnits = allUnits.filter(u => u.Faction === currentFaction || u.Faction === "UR");
+            const categories = [
+                { title: 'Ground Units (Common)', filters: { Faction: selectedFaction, Rarity: 'Common', Mobility: 'Ground', 'Universal Resources': '' } },
+                { title: 'Ground Units (Rare)', filters: { Faction: selectedFaction, Rarity: 'Rare', Mobility: 'Ground', 'Universal Resources': '' } },
+                { title: 'Aerial Units (Common)', filters: { Faction: selectedFaction, Rarity: 'Common', Mobility: 'Aerial', 'Universal Resources': '' } },
+                { title: 'Aerial Units (Rare)', filters: { Faction: selectedFaction, Rarity: 'Rare', Mobility: 'Aerial', 'Universal Resources': '' } },
+                { title: 'Universal Resources Ground (Common)', filters: { Rarity: 'Common', Mobility: 'Ground', 'Universal Resources': 'Yes' } },
+                { title: 'Universal Resources Ground (Rare)', filters: { Rarity: 'Rare', Mobility: 'Ground', 'Universal Resources': 'Yes' } },
+            ];
 
-      const commonDropdown = document.getElementById("common-units");
-      const rareDropdown = document.getElementById("rare-units");
-      const urCommonDropdown = document.getElementById("ur-common-units");
-      const urRareDropdown = document.getElementById("ur-rare-units");
+            const createSelectHTML = (category) => {
+                if (!category) return null;
+                
+                const units = unitData.filter(unit => {
+                    return Object.keys(category.filters).every(key => {
+                        if (key === 'Faction' && category.filters['Universal Resources'] === 'Yes') return true;
+                        const unitValue = unit[key] || ''; 
+                        return unitValue === category.filters[key];
+                    });
+                });
 
-      [commonDropdown, rareDropdown, urCommonDropdown, urRareDropdown].forEach(drop => drop.innerHTML = '<option value="" disabled selected>Select a Unit</option>');
+                if (units.length === 0) return null;
 
-      filteredUnits.forEach((unit, i) => {
-        const opt = document.createElement("option");
-        opt.value = i;
-        opt.textContent = `${unit.Name} | ${unit.Type} | ${unit.Cost}`;
-        const rarity = unit.Rarity.toLowerCase();
+                return `
+                    <div>
+                        <h3 class="section-heading text-sm">${category.title}</h3>
+                        <select class="unit-add-select">
+                            <option value="">Select a Unit</option>
+                            ${units.map(u => `<option value="${u.Name}">${u.Name} (${u.Cost}pts)</option>`).join('')}
+                        </select>
+                    </div>`;
+            };
 
-        if (unit.Faction === "UR") {
-          if (rarity === "common") urCommonDropdown.appendChild(opt);
-          else urRareDropdown.appendChild(opt);
-        } else {
-          if (rarity === "common") commonDropdown.appendChild(opt);
-          else rareDropdown.appendChild(opt);
+            const pairings = [
+                ['Ground Units (Common)', 'Ground Units (Rare)'],
+                ['Aerial Units (Common)', 'Aerial Units (Rare)'],
+                ['Universal Resources Ground (Common)', 'Universal Resources Ground (Rare)']
+            ];
+
+            pairings.forEach(pair => {
+                const html1 = createSelectHTML(categories.find(c => c.title === pair[0]));
+                const html2 = createSelectHTML(categories.find(c => c.title === pair[1]));
+                if (html1 || html2) {
+                    const row = document.createElement('div');
+                    row.className = 'grid grid-cols-1 md:grid-cols-2 gap-4';
+                    row.innerHTML = (html1 || '') + (html2 || '');
+                    dropdownContainer.appendChild(row);
+                }
+            });
+            
+            document.querySelectorAll('.unit-add-select').forEach(sel => {
+                sel.addEventListener('change', (e) => {
+                    if (e.target.value) {
+                        addUnit(e.target.value);
+                        e.target.value = ""; // Reset dropdown
+                    }
+                });
+            });
         }
-      });
+        
+        function addUnit(unitName) {
+            const unitTemplate = unitData.find(u => u.Name === unitName);
+            if (!unitTemplate) return;
 
-      [commonDropdown, rareDropdown, urCommonDropdown, urRareDropdown].forEach(drop => {
-        drop.onchange = (e) => {
-          const index = parseInt(e.target.value);
-          addUnit(index);
-          drop.selectedIndex = 0;
-        };
-      });
+            const newUnit = {
+                ...unitTemplate,
+                id: Date.now() + Math.random(), // Unique ID for each instance
+                training: 'Regular',
+                hasCommand: false,
+                hasPanzerfaust: false,
+            };
 
-      const listBody = document.getElementById("army-list-body");
-      listBody.innerHTML = "";
-      let total = 0;
-      let extraCost = 0;
-      armyList.forEach((unit, i) => {
-        if (!('Command' in unit)) unit.Command = false;
-        if (!('Panzerfaust' in unit)) unit.Panzerfaust = false;
-        if (!('Wound' in unit)) unit.Wound = 0;
-        if (!('Training' in unit)) unit.Training = 'Regular';
-        const extra = (unit.Panzerfaust && ['suit', 'infantry'].includes(unit.Type.toLowerCase())) ? parseInt(unit.Wound || 0) : 0;
-        let commandExtra = (unit.Command && !unit.Name.toLowerCase().includes('command')) ? 20 : 0;
-        let trainingExtra = unit.Training === 'Green' ? -10 : unit.Training === 'Elite' ? 15 : 0;
-        let adjustedCost = unit.Cost + extra + commandExtra + trainingExtra;
-        if (unit.Training === 'Green' && adjustedCost < 5) adjustedCost = 5;
-        total += adjustedCost;
-        listBody.insertAdjacentHTML("beforeend", `<tr><td>${unit.Name}</td><td>${unit.Rarity}</td><td>${['suit', 'infantry'].includes(unit.Type.toLowerCase()) ? `<input type='checkbox' onchange='togglePanzerfaust(${i})' ${unit.Panzerfaust ? "checked" : ""}>` : '-'}</td><td>${unit.Name.toLowerCase().includes('command') ? '-' : `<input type='checkbox' onchange='toggleCommand(${i})' ${unit.Command ? 'checked' : ''}>`}</td><td><select onchange='updateTraining(${i}, this.value)' class='form-select form-select-sm'><option value='Green' ${unit.Training==='Green'?'selected':''}>Green</option><option value='Regular' ${unit.Training==='Regular'?'selected':''}>Regular</option><option value='Elite' ${unit.Training==='Elite'?'selected':''}>Elite</option></select></td><td>${adjustedCost}</td><td><button class='btn btn-sm btn-danger' onclick='removeUnit(${i})'>Remove</button></td></tr>`);
-      });
-      document.getElementById("total-cost").innerText = total;
-    }
-
-    function addUnit(index) {
-      const maxUnits = Math.floor(pointLimit / 600) * 15;
-      if (armyList.length >= maxUnits) {
-        alert(`You may only have up to ${maxUnits} units for a ${pointLimit}-point game.`);
-        return;
-      }
-      const unit = filteredUnits[index];
-      const maxHero = Math.floor(pointLimit / 600);
-      if (unit.Name.toLowerCase().includes('hero')) {
-        const currentHeroCount = armyList.filter(u => u.Name.toLowerCase().includes('hero')).length;
-        if (currentHeroCount >= maxHero) return alert(`Only ${maxHero} Hero unit(s) allowed.`);
-      }
-      const clonedUnit = { ...unit };
-      const adjustedTotal = armyList.reduce((sum, u) => {
-        let base = u.Cost;
-        if (u.Training === 'Green') base = Math.max(5, base - 10);
-        if (u.Training === 'Elite') base += 15;
-        if (u.Panzerfaust && ['suit', 'infantry'].includes(u.Type.toLowerCase())) base += u.Wound;
-        if (u.Command && !u.Name.toLowerCase().includes('command')) base += 20;
-        return sum + base;
-      }, 0);
-      if (adjustedTotal + unit.Cost > pointLimit) {
-        alert("Adding this unit would exceed the point limit.");
-        return;
-      }
-
-      const rarity = unit.Rarity?.toLowerCase();
-      if (rarity === 'rare') {
-        const rareCount = armyList.filter(u => u.Rarity?.toLowerCase() === 'rare' && ['suit', 'vehicle'].includes(u.Type?.toLowerCase())).length;
-        const commonCount = armyList.filter(u => u.Rarity?.toLowerCase() === 'common' && ['suit', 'vehicle'].includes(u.Type?.toLowerCase())).length;
-        if (rareCount + 1 > commonCount) {
-          alert("You cannot have more Rare Suits/Vehicles than Common ones.");
-          return;
+            armyList.push(newUnit);
+            const validationErrors = validateArmy();
+            
+            const fatalError = validationErrors.find(e => e.isFatal);
+            if (fatalError) {
+                armyList.pop(); // Remove the unit
+                validationMessagesEl.innerHTML = `<li>${fatalError.message}</li>`;
+                validationSection.classList.remove('hidden');
+            } else {
+                 render(); 
+            }
         }
-      }
-      clonedUnit.Panzerfaust = false;
-      clonedUnit.Wound = unit.Wound || 0;
-      clonedUnit.Command = false;
-      clonedUnit.Training = 'Regular';
-      const urUnits = armyList.filter(u => u.Faction === 'UR').length;
-      const suitUnits = armyList.filter(u => u.Type?.toLowerCase() === 'suit').length;
-      const maxUR = Math.floor(pointLimit / 600) * 5;
-      if (unit.Faction === 'UR') {
-        if (urUnits >= maxUR) {
-          alert(`No more than ${maxUR} UR units allowed.`);
-          return;
+        
+        function calculateUnitCost(unit) {
+             let cost = unit.Cost;
+            if (unit.training === 'Green') cost = Math.max(5, cost - 10);
+            else if (unit.training === 'Elite') cost += 15;
+            if (unit.hasCommand) cost += 20;
+            if (unit.hasPanzerfaust) cost += unit.Wounds;
+            return cost;
         }
-        if (urUnits >= suitUnits) {
-          alert('UR units must not exceed the number of Suit units.');
-          return;
+
+        function render() {
+            armyListBody.innerHTML = '';
+            
+            emptyListMessage.style.display = armyList.length === 0 ? 'table-row' : 'none';
+            
+            armyList.forEach(unit => {
+                const tr = document.createElement('tr');
+                const isHero = unit.Name.toLowerCase().includes('hero');
+                const canHavePanzerfaust = ['Suit', 'Infantry'].includes(unit.Type);
+                const hasCommandKeyword = unit.Name.toLowerCase().includes('command');
+
+                const trainingDropdown = isHero ? 
+                    `<span class="font-bold text-yellow-600">Elite</span>` :
+                    `<select class="table-select training-select" data-id="${unit.id}">
+                        <option value="Green" ${unit.training === 'Green' ? 'selected' : ''}>Green</option>
+                        <option value="Regular" ${unit.training === 'Regular' ? 'selected' : ''}>Regular</option>
+                        <option value="Elite" ${unit.training === 'Elite' ? 'selected' : ''}>Elite</option>
+                    </select>`;
+
+                tr.innerHTML = `
+                    <td class="font-bold">${unit.Name} <span class="text-xs text-gray-500">(${unit.Type})</span></td>
+                    <td>${unit.Rarity}</td>
+                    <td>${trainingDropdown}</td>
+                    <td>
+                        ${!hasCommandKeyword ? `<button class="btn ${unit.hasCommand ? 'btn-toggle-active' : 'btn-toggle-inactive'} command-toggle" data-id="${unit.id}">${unit.hasCommand ? 'ON' : 'OFF'}</button>` : '<span class="text-gray-500">-</span>'}
+                    </td>
+                    <td>
+                        ${canHavePanzerfaust ? `<button class="btn ${unit.hasPanzerfaust ? 'btn-toggle-active' : 'btn-toggle-inactive'} panzerfaust-toggle" data-id="${unit.id}">${unit.hasPanzerfaust ? 'ON' : 'OFF'}</button>` : '<span class="text-gray-500">-</span>'}
+                    </td>
+                    <td class="font-bold">${calculateUnitCost(unit)}</td>
+                    <td><button class="btn remove-btn" data-id="${unit.id}">X</button></td>
+                `;
+                armyListBody.appendChild(tr);
+            });
+            
+            document.querySelectorAll('.remove-btn').forEach(btn => btn.onclick = (e) => handleUnitModification(e, 'remove'));
+            document.querySelectorAll('.training-select').forEach(sel => sel.onchange = (e) => handleUnitModification(e, 'training'));
+            document.querySelectorAll('.command-toggle').forEach(btn => btn.onclick = (e) => handleUnitModification(e, 'command'));
+            document.querySelectorAll('.panzerfaust-toggle').forEach(btn => btn.onclick = (e) => handleUnitModification(e, 'panzerfaust'));
+
+            const totalPoints = armyList.reduce((acc, unit) => acc + calculateUnitCost(unit), 0);
+            totalPointsEl.textContent = totalPoints;
+            limitPointsEl.textContent = pointsLimit;
+            
+            totalPointsEl.classList.toggle('text-green-700', totalPoints <= pointsLimit);
+            totalPointsEl.classList.toggle('text-red-600', totalPoints > pointsLimit);
+            
+            const errors = validateArmy();
+            if (errors.length > 0) {
+                validationMessagesEl.innerHTML = errors.map(e => `<li>${e.message}</li>`).join('');
+                validationSection.classList.remove('hidden');
+            } else {
+                validationSection.classList.add('hidden');
+            }
         }
-      }
-      armyList.push(clonedUnit);
-      render();
-    }
 
-    function togglePanzerfaust(index) {
-      const unit = armyList[index];
-      if (!['suit', 'infantry'].includes(unit.Type.toLowerCase())) {
-        alert('Only Suits and Infantry can use Panzerfausts.');
-        return;
-      }
-      unit.Panzerfaust = !unit.Panzerfaust;
-      render();
-    }
+        // --- VALIDATION ENGINE ---
+        function validateArmy() {
+            let errors = [];
+            const multiplier = pointsLimit / 600;
 
-    function toggleCommand(index) {
-      const maxCommand = Math.floor(pointLimit / 600);
-      const count = armyList.filter(u => u.Command).length;
-      const unit = armyList[index];
-      if (unit.Command || count < maxCommand) {
-        unit.Command = !unit.Command;
-        render();
-      } else {
-        alert(`Only ${maxCommand} Command unit(s) allowed.`);
-      }
-    }
+            const totalPoints = armyList.reduce((acc, unit) => acc + calculateUnitCost(unit), 0);
+            if (totalPoints > pointsLimit) {
+                errors.push({ message: `Total points (${totalPoints}) exceed the limit of ${pointsLimit}.`, isFatal: true });
+            }
+            
+            const maxUnits = 15 * multiplier;
+            if (armyList.length > maxUnits) {
+                errors.push({ message: `Too many units (${armyList.length}). Maximum is ${maxUnits} for a ${pointsLimit}pt army.`, isFatal: true });
+            }
 
-    function updateTraining(index, level) {
-      const greenMax = Math.floor(pointLimit / 600) * 4;
-      const eliteMax = Math.floor(pointLimit / 600) * 4;
-      const greenCount = armyList.filter(u => u.Training === 'Green').length;
-      const eliteCount = armyList.filter(u => u.Training === 'Elite').length;
+            const minSuits = Math.ceil(pointsLimit / 600) * 3;
+            const suitCount = armyList.filter(u => u.Type === 'Suit').length;
+            if (suitCount < minSuits) {
+                errors.push({ message: `Not enough Suits (${suitCount}). You need at least ${minSuits} for a ${pointsLimit}pt army.` });
+            }
 
-      if (level === 'Green' && greenCount >= greenMax && armyList[index].Training !== 'Green') {
-        alert(`Only ${greenMax} Green units allowed.`);
-        return;
-      }
-      if (level === 'Elite' && eliteCount >= eliteMax && armyList[index].Training !== 'Elite') {
-        alert(`Only ${eliteMax} Elite units allowed.`);
-        return;
-      }
-      armyList[index].Training = level;
-      render();
-    }
+            const commonCount = armyList.filter(u => u.Rarity === 'Common' && !(u.Support || u['Universal Resources'] === 'Yes')).length;
+            const rareCount = armyList.filter(u => u.Rarity === 'Rare' && u['Universal Resources'] !== 'Yes' && u.Mobility !== 'Aerial').length;
+            if (rareCount > commonCount) {
+                errors.push({ message: `Number of Rare ground units (${rareCount}) cannot exceed Common ground units (${commonCount}).` });
+            }
+            
+            armyList.filter(u => u.Support).forEach(supportUnit => {
+                const parentUnits = armyList.filter(u => u.Name === supportUnit.Support);
+                if (parentUnits.length === 0) {
+                     errors.push({ message: `Support unit "${supportUnit.Name}" requires a parent "${supportUnit.Support}" unit, which is not in the list.`, isFatal: true });
+                }
+                const siblingSupportUnits = armyList.filter(u => u.Support === supportUnit.Support);
+                if(siblingSupportUnits.length > parentUnits.length){
+                     errors.push({ message: `Too many "${supportUnit.Name}" support units. Ratio to parent "${supportUnit.Support}" cannot exceed 1:1.` });
+                }
+            });
+            
+            const maxUniversal = 5 * multiplier;
+            const universalCount = armyList.filter(u => u['Universal Resources'] === 'Yes').length;
+            if (universalCount > maxUniversal) {
+                 errors.push({ message: `Too many Universal Resources units (${universalCount}). Maximum is ${maxUniversal}.` });
+            }
+            if(universalCount > suitCount){
+                errors.push({ message: `Universal Resources units (${universalCount}) cannot exceed Suit units (${suitCount}).` });
+            }
 
-    function removeUnit(index) {
-      armyList.splice(index, 1);
-      render();
-    }
+            const commonAerials = armyList.filter(u => u.Mobility === 'Aerial' && u.Rarity === 'Common').length;
+            const rareAerials = armyList.filter(u => u.Mobility === 'Aerial' && u.Rarity === 'Rare').length;
+             if (rareAerials > commonAerials) {
+                errors.push({ message: `Number of Rare Aerial units (${rareAerials}) cannot exceed Common Aerial units (${commonAerials}).` });
+            }
+            
+            const maxSpecialTraining = 4 * multiplier;
+            const greenCount = armyList.filter(u => u.training === 'Green').length;
+            const eliteCount = armyList.filter(u => u.training === 'Elite' || u.Name.toLowerCase().includes('hero')).length;
+             if (greenCount > maxSpecialTraining) {
+                errors.push({ message: `Too many Green units (${greenCount}). Maximum is ${maxSpecialTraining}.` });
+            }
+             if (eliteCount > maxSpecialTraining) {
+                errors.push({ message: `Too many Elite units (${eliteCount}). Maximum is ${maxSpecialTraining}.` });
+            }
+            
+            const maxCommand = 1 * multiplier;
+            const commandCount = armyList.filter(u => u.hasCommand).length;
+            if (commandCount > maxCommand) {
+                errors.push({ message: `Too many Command units (${commandCount}). Maximum is ${maxCommand}.` });
+            }
 
-    function exportToPDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      doc.setFontSize(14);
-      doc.text("MaK Army List", 20, 20);
-      let y = 30;
-      armyList.forEach(unit => {
-        const panzerfaust = unit.Panzerfaust ? 'Yes' : 'No';
-        const command = unit.Command ? 'Yes' : 'No';
-        const training = unit.Training || 'Regular';
-        let base = unit.Cost;
-        if (training === 'Green') base = Math.max(5, base - 10);
-        if (training === 'Elite') base += 15;
-        if (unit.Panzerfaust && ['suit', 'infantry'].includes(unit.Type.toLowerCase())) base += unit.Wound;
-        if (unit.Command && !unit.Name.toLowerCase().includes('command')) base += 20;
-        doc.text(`${unit.Name} - ${base} pts | Rarity: ${unit.Rarity} | Panzerfaust: ${panzerfaust} | Command: ${command} | Training: ${training}`, 20, y, { maxWidth: 170 });
-        y += 10;
-      });
-      const totalCost = armyList.reduce((sum, u) => {
-        let base = u.Cost;
-        if (u.Training === 'Green') base = Math.max(5, base - 10);
-        if (u.Training === 'Elite') base += 15;
-        if (u.Panzerfaust && ['suit', 'infantry'].includes(u.Type.toLowerCase())) base += u.Wound;
-        if (u.Command && !u.Name.toLowerCase().includes('command')) base += 20;
-        return sum + base;
-      }, 0);
-      doc.text(`Total: ${totalCost} pts`, 20, y + 10);
-      doc.save("mak-army.pdf");
-    }
+            const maxHeroes = 1 * multiplier;
+            const heroCount = armyList.filter(u => u.Name.toLowerCase().includes('hero')).length;
+            if(heroCount > maxHeroes) {
+                errors.push({ message: `Too many Hero units (${heroCount}). Maximum is ${maxHeroes}.` });
+            }
 
-    fetchUnits();
-  </script>
+            const fdUnits = armyList.filter(u => u['Forward Deployment'] === 'Yes');
+            const fdPoints = fdUnits.reduce((acc, unit) => acc + calculateUnitCost(unit), 0);
+            const maxFdUnits = 4;
+            if (fdUnits.length > 0) {
+                 const fdPointLimit = totalPoints * 0.20;
+                 if (fdPoints > fdPointLimit && fdUnits.length > maxFdUnits) {
+                      errors.push({ message: `Forward Deployment points (${fdPoints}) exceed 20% of total army cost and you have more than ${maxFdUnits} units.` });
+                 } else if (fdPoints > fdPointLimit) {
+                      errors.push({ message: `Forward Deployment points (${fdPoints}) cannot exceed 20% of total army cost (${fdPointLimit.toFixed(0)}).` });
+                 } else if (fdUnits.length > maxFdUnits) {
+                      errors.push({ message: `Cannot have more than ${maxFdUnits} Forward Deployment units.` });
+                 }
+            }
+            
+            return errors;
+        }
+
+        // --- EVENT HANDLERS ---
+        function handleFactionChange(e) {
+            selectedFaction = e.target.value;
+            // Update header style based on faction
+            pageHeader.classList.remove('header-ima', 'header-sdr');
+            if (selectedFaction === 'IMA') {
+                pageHeader.classList.add('header-ima');
+            } else if (selectedFaction === 'SDR') {
+                pageHeader.classList.add('header-sdr');
+            }
+            resetArmy();
+            populateDropdowns();
+        }
+
+        function handlePointsChange(e) {
+            if (e.target.classList.contains('points-btn')) {
+                pointsLimit = parseInt(e.target.dataset.points, 10);
+                document.querySelectorAll('#points-container button').forEach(btn => btn.classList.remove('btn-active'));
+                e.target.classList.add('btn-active');
+                render();
+            }
+        }
+        
+        function handleUnitModification(e, type) {
+            const unitId = parseFloat(e.currentTarget.dataset.id);
+            const unit = armyList.find(u => u.id === unitId);
+            if (!unit) return;
+
+            switch (type) {
+                case 'remove': armyList = armyList.filter(u => u.id !== unitId); break;
+                case 'training': unit.training = e.currentTarget.value; break;
+                case 'command': unit.hasCommand = !unit.hasCommand; break;
+                case 'panzerfaust': unit.hasPanzerfaust = !unit.hasPanzerfaust; break;
+            }
+             render();
+        }
+
+        function exportPDF() {
+            const doc = new jsPDF();
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(18);
+            doc.text('MaK in 15mm Army Roster', 105, 15, { align: 'center' });
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Faction: ${selectedFaction || 'N/A'}`, 14, 25);
+            doc.text(`Point Limit: ${pointsLimit}`, 105, 25, { align: 'center' });
+            const totalPoints = armyList.reduce((acc, unit) => acc + calculateUnitCost(unit), 0);
+            doc.text(`Total Points: ${totalPoints}`, 196, 25, { align: 'right' });
+
+            const tableData = armyList.map(unit => {
+                const modifications = [unit.training !== 'Regular' ? unit.training : '', unit.hasCommand ? 'Command' : '', unit.hasPanzerfaust ? 'Panzerfaust' : ''].filter(Boolean).join(', ') || '-';
+                return [unit.Name, unit.Type, unit.Rarity, modifications, calculateUnitCost(unit)];
+            });
+
+            doc.autoTable({
+                head: [['Unit', 'Type', 'Rarity', 'Upgrades', 'Cost']],
+                body: tableData,
+                startY: 30,
+                theme: 'grid',
+                headStyles: { fillColor: [79, 94, 106] },
+                styles: { font: 'helvetica', fontSize: 10 },
+            });
+
+            doc.save(`MaK_Army_List_${selectedFaction}_${pointsLimit}pts.pdf`);
+        }
+        
+        initialize();
+
+    </script>
 </body>
 </html>
+
