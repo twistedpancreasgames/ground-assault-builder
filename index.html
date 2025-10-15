@@ -23,9 +23,9 @@
         as requested to ensure they always appear correctly.
         */
         :root {
-            --header-default: url('https://i.imgur.com/5epAAh9.jpeg');
-            --header-ima: url('https://i.imgur.com/efgRqbr.jpeg');
-            --header-sdr: url('https://i.imgur.com/oVbGysC.jpeg');
+            --header-default: url('https://i.imgur.com/5eVzsBZ.jpeg');
+            --header-ima: url('https://i.imgur.com/SBo8wa6.jpeg');
+            --header-sdr: url('https://i.imgur.com/i1Paf7r.jpeg');
         }
 
         /* Custom styles for the new theme */
@@ -38,9 +38,9 @@
             background-image: var(--header-default);
             background-size: cover;
             background-position: center;
-            padding: 1rem;
             color: white;
             transition: background-image 0.5s ease-in-out;
+            position: relative;
         }
         #page-header.header-ima {
             background-image: var(--header-ima);
@@ -59,28 +59,19 @@
         .btn {
             @apply px-4 py-2 rounded-md shadow-sm transition-all duration-200 ease-in-out text-sm font-bold border;
         }
-        .btn-primary {
-            @apply bg-[#AC2436] hover:bg-[#8e1c2b] text-white border-transparent;
-        }
-        .btn-toggle-active {
-            @apply bg-green-600 text-white border-transparent ring-2 ring-offset-2 ring-offset-white ring-green-600;
-        }
-        .btn-toggle-inactive {
-             @apply bg-gray-200/70 text-gray-500 border-gray-400/50;
-        }
         .points-btn {
              @apply bg-white hover:bg-gray-200 text-[#4F5E6A] border-2 border-[#B89248];
         }
         .points-btn.btn-active {
             background-color: #D6B371;
             border-color: #B89248;
-            color: #403624;
+            color: #402424;
             font-weight: bold;
         }
         select, .table-select {
             background-color: #D6B371;
             border: 2px solid #B89248;
-            color: #403624;
+            color: #402424;
             font-weight: bold;
             @apply w-full rounded-md py-2 px-3 focus:ring-2 focus:ring-offset-2 focus:ring-[#B89248] focus:border-[#B89248];
         }
@@ -88,14 +79,16 @@
             background-color: white;
             color: #333;
         }
+        .table th, .table td {
+            vertical-align: top; /* Explicitly set vertical alignment to top */
+        }
         .table th {
             background-color: #D6B371;
             border: 2px solid #B89248;
-            color: #403624;
+            color: #402424;
             font-family: 'Manrope', sans-serif;
             font-weight: 800;
             text-transform: capitalize;
-            text-align: left; /* Explicitly align text to the left */
             @apply px-4 py-3 text-sm;
         }
         .table td {
@@ -105,7 +98,7 @@
             background-color: rgba(79, 94, 106, 0.05);
         }
         #validation-messages {
-            @apply list-disc list-inside text-red-800 font-bold mt-4 p-4 border-2 border-red-600 rounded-lg bg-red-100;
+            @apply list-disc list-inside text-[#AC2436] font-bold mt-2 p-4 border-2 border-[#AC2436] rounded-lg bg-red-50;
         }
         .loader {
             border: 4px solid #f3f3f3;
@@ -119,13 +112,19 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        .remove-weapon-btn {
+            @apply ml-2 text-red-500 hover:text-red-700 font-bold;
+        }
     </style>
 </head>
 <body class="antialiased">
 
-    <header id="page-header" class="text-center mb-8 shadow-lg h-20 flex items-center justify-center">
+    <header id="page-header" class="mb-8 shadow-lg h-24 flex items-center justify-center">
+        <img id="ima-logo" src="https://i.imgur.com/CTCo37x.png" alt="IMA Logo" class="absolute top-0 left-0 h-full w-auto p-2 z-10 hidden">
+        <img id="sdr-logo" src="https://i.imgur.com/QOuVXxB.png" alt="SDR Logo" class="absolute top-0 left-0 h-full w-auto p-2 z-10 hidden">
+        <img id="mak-logo" src="https://i.imgur.com/FnXlvwN.png" alt="MaK Logo" class="absolute top-0 right-0 h-full w-auto p-2 z-10">
         <h1 class="sr-only">MaK in 15mm Army Builder</h1>
-        <p class="sr-only">V0.7 - Final Polish</p>
+        <p class="sr-only">V1.0.1 - Style Fix</p>
     </header>
 
     <div class="container mx-auto p-4 md:p-8 max-w-7xl">
@@ -156,16 +155,13 @@
             <!-- Unit Selection Section -->
             <section id="unit-selection-section" class="hidden">
                  <h2 class="section-heading">Unit Deployment</h2>
-                 <div id="data-status" class="text-center p-4">
-                    <!-- Loading/Error messages will go here -->
-                 </div>
-                 <div id="dropdown-container" class="flex flex-col gap-4 hidden">
-                     <!-- Unit Dropdowns will be populated here by JS -->
-                 </div>
+                 <div id="data-status" class="text-center p-4"></div>
+                 <div id="dropdown-container" class="flex flex-col gap-4 hidden"></div>
             </section>
             
             <!-- Validation Messages -->
             <section id="validation-section" class="hidden">
+                 <h2 class="section-heading text-[#AC2436]">Attention!</h2>
                  <ul id="validation-messages"></ul>
             </section>
             
@@ -181,21 +177,20 @@
                     </div>
                 </div>
                 <div class="overflow-x-auto bg-white rounded-md shadow">
-                    <table class="w-full table min-w-[800px]">
+                    <table class="w-full table min-w-[900px]">
                         <thead>
                             <tr>
-                                <th>Unit</th>
-                                <th>Rarity</th>
-                                <th>Training</th>
-                                <th>Command</th>
-                                <th>Panzerfaust</th>
-                                <th>Cost</th>
-                                <th>Remove</th>
+                                <th class="text-left">Unit</th>
+                                <th class="text-left">Rarity</th>
+                                <th class="text-left">Training</th>
+                                <th class="text-left">Hard Points</th>
+                                <th class="text-center">Command</th>
+                                <th class="text-center">Panzerfaust</th>
+                                <th class="text-center">Cost</th>
+                                <th class="text-center">Remove</th>
                             </tr>
                         </thead>
-                        <tbody id="army-list">
-                           <!-- Army list rows will be added here -->
-                        </tbody>
+                        <tbody id="army-list"></tbody>
                     </table>
                      <div id="empty-list-message" class="text-center py-8 text-gray-500">
                         Your army list is empty. Select a faction to begin.
@@ -207,27 +202,29 @@
             <section class="text-center mt-8">
                 <button id="export-pdf" class="btn btn-primary w-full md:w-auto">Export to PDF</button>
             </section>
-
         </main>
     </div>
 
     <script type="module">
         const { jsPDF } = window.jspdf;
 
-        // --- DATA SOURCE ---
+        // --- DATA SOURCE & CONFIG ---
         const GOOGLE_SHEET_ID = '1fofK8kEvGMV7-ZGSWdJHExhFU0iBBaE3XpzNSucHlpg';
-        const GOOGLE_SHEET_GID = '0'; // '0' is usually the first sheet. Change if you use a different one.
+        const GOOGLE_SHEET_GID = '0';
         const GOOGLE_SHEET_URL = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/export?format=csv&gid=${GOOGLE_SHEET_GID}`;
         
-        let unitData = []; // This will be populated from Google Sheets
+        const hardPointWeapons = [
+            { name: 'HMG', cost: 1 }, { name: 'Heavy Laser', cost: 2 }, { name: 'Small Missile', cost: 1 },
+            { name: 'Heavy Missile', cost: 2 }, { name: 'Cluster Bomb', cost: 2 }, { name: 'Small Bomb', cost: 1 },
+            { name: 'Large Bomb', cost: 3 }, { name: 'Targeting Laser', cost: 1 }
+        ];
 
-        // --- STATIC ASSETS ---
         const factionImagesBase64 = {
-            IMA: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwMDAwYEBAMFBwYHBwcGBwcICQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/2wBDAQICAgMDAwYDAwYMCAcIDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAz/wAARCAAmAPADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1VXVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX9jZ2uLj5OXm5+jp6vLz9PX29/j5+v/aAAwDAQACEQMRAD8A/v4ooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA/9k=',
-            SDR: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwMDAwYEBAMFBwYHBwcGBwcICQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/wBDAQICAgMDAwYDAwYMCAcIDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAz/wAARCAAmAPADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1VXVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX9jZ2uLj5OXm5+jp6vLz9PX2+9/j5+v/aAAwDAQACEQMRAD8A/v4ooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA/9k='
+            IMA: 'data:image/jpeg;base64,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',
+            SDR: 'data:image/jpeg;base64,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'
         };
-
-        // --- STATE MANAGEMENT ---
+        
+        let unitData = [];
         let armyList = [];
         let selectedFaction = null;
         let pointsLimit = 600;
@@ -246,77 +243,56 @@
         const validationMessagesEl = document.getElementById('validation-messages');
         const exportPdfBtn = document.getElementById('export-pdf');
         const dataStatusEl = document.getElementById('data-status');
+        const imaLogo = document.getElementById('ima-logo');
+        const sdrLogo = document.getElementById('sdr-logo');
 
-        // --- CORE FUNCTIONS ---
         async function initialize() {
-            // Set initial active button
-            const initialPointsBtn = document.querySelector(`#points-container button[data-points="${pointsLimit}"]`);
-            if (initialPointsBtn) initialPointsBtn.classList.add('btn-active');
-            
+            document.querySelector(`#points-container button[data-points="${pointsLimit}"]`)?.classList.add('btn-active');
             factionSelect.addEventListener('change', handleFactionChange);
             pointsContainer.addEventListener('click', handlePointsChange);
             exportPdfBtn.addEventListener('click', exportPDF);
-            
             await loadUnitData();
             render();
         }
 
         function csvToJson(csv) {
             const lines = csv.replace(/\r/g, '').split('\n').filter(line => line.trim() !== '');
-            const result = [];
-            if (lines.length < 2) return result; 
-
+            if (lines.length < 2) return [];
             const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
-
-            for (let i = 1; i < lines.length; i++) {
+            return lines.slice(1).map(line => {
+                const values = line.split(',');
+                if (values.length !== headers.length) return null;
                 const obj = {};
-                const currentline = lines[i].split(',');
-                
-                if (currentline.length !== headers.length) {
-                    console.warn(`Skipping malformed CSV row ${i + 1}.`, lines[i]);
-                    continue;
-                }
-
                 headers.forEach((header, index) => {
-                    let value = currentline[index] ? currentline[index].trim().replace(/"/g, '') : '';
-                    if (header === 'Cost' || header === 'Wounds') {
+                    let value = values[index]?.trim().replace(/"/g, '') || '';
+                    if (['Cost', 'Wounds', 'Hard Points'].includes(header)) {
                         value = parseInt(value, 10) || 0;
                     }
                     obj[header] = value;
                 });
-                result.push(obj);
-            }
-            return result;
+                return obj;
+            }).filter(Boolean);
         }
 
         async function loadUnitData() {
-            dataStatusEl.innerHTML = `<div class="flex justify-center items-center gap-3"><div class="loader"></div><p>Loading unit data from Google Sheet...</p></div>`;
+            dataStatusEl.innerHTML = `<div class="flex justify-center items-center gap-3"><div class="loader"></div><p>Loading unit data...</p></div>`;
             try {
                 const response = await fetch(GOOGLE_SHEET_URL);
-                if (!response.ok) throw new Error(`Network response was not ok: ${response.statusText}`);
-                
+                if (!response.ok) throw new Error(`Network error: ${response.statusText}`);
                 const csvData = await response.text();
                 unitData = csvToJson(csvData);
-
-                if(unitData.length === 0) throw new Error('No data found or failed to parse. Ensure the Google Sheet is published and not empty.');
-                
+                if (unitData.length === 0) throw new Error('No data found or failed to parse.');
                 dataStatusEl.innerHTML = '';
                 dropdownContainer.classList.remove('hidden');
             } catch (error) {
-                console.error('Failed to load unit data:', error);
-                dataStatusEl.innerHTML = `<p class="text-red-600 font-bold">Error loading unit data. Please ensure you have followed the 'Publish to web' instructions for your Google Sheet.</p>`;
-                dropdownContainer.classList.add('hidden');
+                console.error('Load unit data failed:', error);
+                dataStatusEl.innerHTML = `<p class="text-red-600 font-bold">Error loading unit data. Please ensure Google Sheet is published to the web as a CSV.</p>`;
             }
         }
-
-        function resetArmy() {
-            armyList = [];
-            render();
-        }
-
+        
         function populateDropdowns() {
             dropdownContainer.innerHTML = '';
-            if (!selectedFaction || unitData.length === 0) {
+            if (!selectedFaction) {
                 unitSelectionSection.classList.add('hidden');
                 return;
             }
@@ -325,34 +301,11 @@
             const categories = [
                 { title: 'Ground Units (Common)', filters: { Faction: selectedFaction, Rarity: 'Common', Mobility: 'Ground', 'Universal Resources': '' } },
                 { title: 'Ground Units (Rare)', filters: { Faction: selectedFaction, Rarity: 'Rare', Mobility: 'Ground', 'Universal Resources': '' } },
-                { title: 'Aerial Units (Common)', filters: { Faction: selectedFaction, Rarity: 'Common', Mobility: 'Aerial', 'Universal Resources': '' } },
-                { title: 'Aerial Units (Rare)', filters: { Faction: selectedFaction, Rarity: 'Rare', Mobility: 'Aerial', 'Universal Resources': '' } },
+                { title: 'Aerial Units (Common)', filters: { Faction: selectedFaction, Rarity: 'Common', Mobility: 'Aerial' } },
+                { title: 'Aerial Units (Rare)', filters: { Faction: selectedFaction, Rarity: 'Rare', Mobility: 'Aerial' } },
                 { title: 'Universal Resources Ground (Common)', filters: { Rarity: 'Common', Mobility: 'Ground', 'Universal Resources': 'Yes' } },
                 { title: 'Universal Resources Ground (Rare)', filters: { Rarity: 'Rare', Mobility: 'Ground', 'Universal Resources': 'Yes' } },
             ];
-
-            const createSelectHTML = (category) => {
-                if (!category) return null;
-                
-                const units = unitData.filter(unit => {
-                    return Object.keys(category.filters).every(key => {
-                        if (key === 'Faction' && category.filters['Universal Resources'] === 'Yes') return true;
-                        const unitValue = unit[key] || ''; 
-                        return unitValue === category.filters[key];
-                    });
-                });
-
-                if (units.length === 0) return null;
-
-                return `
-                    <div>
-                        <h3 class="section-heading text-sm">${category.title}</h3>
-                        <select class="unit-add-select">
-                            <option value="">Select a Unit</option>
-                            ${units.map(u => `<option value="${u.Name}">${u.Name} (${u.Cost}pts)</option>`).join('')}
-                        </select>
-                    </div>`;
-            };
 
             const pairings = [
                 ['Ground Units (Common)', 'Ground Units (Rare)'],
@@ -361,53 +314,45 @@
             ];
 
             pairings.forEach(pair => {
-                const html1 = createSelectHTML(categories.find(c => c.title === pair[0]));
-                const html2 = createSelectHTML(categories.find(c => c.title === pair[1]));
-                if (html1 || html2) {
+                const htmls = pair.map(title => {
+                    const category = categories.find(c => c.title === title);
+                    const units = unitData.filter(unit => Object.entries(category.filters).every(([key, value]) => {
+                        if (key === 'Faction' && category.filters['Universal Resources'] === 'Yes') return true;
+                        return (unit[key] || '') === value;
+                    }));
+                    if (units.length === 0) return null;
+                    return `<div><h3 class="section-heading text-sm">${title}</h3><select class="unit-add-select"><option value="">Select a Unit</option>${units.map(u => `<option value="${u.Name}">${u.Name} (${u.Cost}pts)</option>`).join('')}</select></div>`;
+                }).filter(Boolean);
+                
+                if (htmls.length > 0) {
                     const row = document.createElement('div');
                     row.className = 'grid grid-cols-1 md:grid-cols-2 gap-4';
-                    row.innerHTML = (html1 || '') + (html2 || '');
+                    row.innerHTML = htmls.join('');
                     dropdownContainer.appendChild(row);
                 }
             });
             
-            document.querySelectorAll('.unit-add-select').forEach(sel => {
-                sel.addEventListener('change', (e) => {
-                    if (e.target.value) {
-                        addUnit(e.target.value);
-                        e.target.value = ""; // Reset dropdown
-                    }
-                });
-            });
+            document.querySelectorAll('.unit-add-select').forEach(sel => sel.addEventListener('change', e => {
+                if (e.target.value) {
+                    addUnit(e.target.value);
+                    e.target.value = "";
+                }
+            }));
         }
         
         function addUnit(unitName) {
             const unitTemplate = unitData.find(u => u.Name === unitName);
             if (!unitTemplate) return;
-
-            const newUnit = {
-                ...unitTemplate,
-                id: Date.now() + Math.random(),
-                training: 'Regular',
-                hasCommand: false,
-                hasPanzerfaust: false,
-            };
-
+            const newUnit = { ...unitTemplate, id: Date.now() + Math.random(), training: 'Regular', hasCommand: false, hasPanzerfaust: false, selectedWeapons: [] };
             armyList.push(newUnit);
-            const validationErrors = validateArmy();
-            
-            const fatalError = validationErrors.find(e => e.isFatal);
-            if (fatalError) {
-                armyList.pop(); // Remove the unit
-                validationMessagesEl.innerHTML = `<li>${fatalError.message}</li>`;
-                validationSection.classList.remove('hidden');
-            } else {
-                 render(); 
+            if (validateArmy().some(e => e.isFatal)) {
+                armyList.pop();
             }
+            render();
         }
         
         function calculateUnitCost(unit) {
-             let cost = unit.Cost;
+            let cost = unit.Cost;
             if (unit.training === 'Green') cost = Math.max(5, cost - 10);
             else if (unit.training === 'Elite') cost += 15;
             if (unit.hasCommand) cost += 20;
@@ -416,177 +361,108 @@
         }
 
         function render() {
-            armyListBody.innerHTML = '';
-            emptyListMessage.style.display = armyList.length === 0 ? 'table-row' : 'none';
-            
-            armyList.forEach(unit => {
-                const tr = document.createElement('tr');
+            armyListBody.innerHTML = armyList.map(unit => {
                 const isHero = unit.Name.toLowerCase().includes('hero');
-                const canHavePanzerfaust = ['Suit', 'Infantry'].includes(unit.Type);
                 const hasCommandKeyword = unit.Name.toLowerCase().includes('command');
-
-                const trainingDropdown = isHero ? 
-                    `<span class="font-bold text-yellow-600">Elite</span>` :
+                const canHavePanzerfaust = ['Suit', 'Infantry'].includes(unit.Type);
+                const isAerial = unit.Mobility === 'Aerial';
+                
+                const trainingHTML = isHero ? `<span class="font-bold text-yellow-600">Elite</span>` :
                     `<select class="table-select training-select" data-id="${unit.id}">
                         <option value="Green" ${unit.training === 'Green' ? 'selected' : ''}>Green</option>
                         <option value="Regular" ${unit.training === 'Regular' ? 'selected' : ''}>Regular</option>
                         <option value="Elite" ${unit.training === 'Elite' ? 'selected' : ''}>Elite</option>
                     </select>`;
 
-                tr.innerHTML = `
+                const hardpointsHTML = !isAerial ? '<span class="text-gray-400">-</span>' :
+                    `<div class="space-y-1">
+                        <select class="table-select hardpoint-select text-xs py-1" data-id="${unit.id}">
+                            <option value="">Add Weapon...</option>
+                            ${hardPointWeapons.map(w => `<option value="${w.name}">${w.name} (${w.cost} HP)</option>`).join('')}
+                        </select>
+                        <div class="selected-weapons-list space-y-1 mt-1">
+                            ${unit.selectedWeapons.map(w_name => {
+                                const weapon = hardPointWeapons.find(w => w.name === w_name);
+                                return `<div class="flex justify-between items-center text-xs bg-gray-100 px-2 py-0.5 rounded">
+                                            <span>${weapon.name}</span>
+                                            <button class="remove-weapon-btn" data-id="${unit.id}" data-weapon="${w_name}">×</button>
+                                        </div>`;
+                            }).join('')}
+                        </div>
+                     </div>`;
+                
+                const commandHTML = hasCommandKeyword || isAerial ? '<span class="text-gray-400">-</span>' : 
+                    `<input type="checkbox" class="w-5 h-5 command-checkbox" data-id="${unit.id}" ${unit.hasCommand ? 'checked' : ''}>`;
+                
+                return `<tr>
                     <td class="font-bold">${unit.Name} <span class="text-xs text-gray-500">(${unit.Type})</span></td>
                     <td>${unit.Rarity}</td>
-                    <td>${trainingDropdown}</td>
-                    <td>
-                        ${!hasCommandKeyword ? `<button class="btn ${unit.hasCommand ? 'btn-toggle-active' : 'btn-toggle-inactive'} command-toggle" data-id="${unit.id}">${unit.hasCommand ? 'ON' : 'OFF'}</button>` : '<span class="text-gray-500">-</span>'}
-                    </td>
-                    <td>
-                        ${canHavePanzerfaust ? `<button class="btn ${unit.hasPanzerfaust ? 'btn-toggle-active' : 'btn-toggle-inactive'} panzerfaust-toggle" data-id="${unit.id}">${unit.hasPanzerfaust ? 'ON' : 'OFF'}</button>` : '<span class="text-gray-500">-</span>'}
-                    </td>
-                    <td class="font-bold">${calculateUnitCost(unit)}</td>
-                    <td><button class="btn remove-btn" data-id="${unit.id}">X</button></td>
-                `;
-                armyListBody.appendChild(tr);
-            });
+                    <td>${trainingHTML}</td>
+                    <td>${hardpointsHTML}</td>
+                    <td class="text-center">${commandHTML}</td>
+                    <td class="text-center">${canHavePanzerfaust ? `<input type="checkbox" class="w-5 h-5 panzerfaust-checkbox" data-id="${unit.id}" ${unit.hasPanzerfaust ? 'checked' : ''}>` : '-'}</td>
+                    <td class="text-center font-bold">${calculateUnitCost(unit)}</td>
+                    <td class="text-center"><button class="btn remove-btn text-red-500 hover:bg-red-100" data-id="${unit.id}">X</button></td>
+                </tr>`;
+            }).join('');
             
-            document.querySelectorAll('.remove-btn').forEach(btn => btn.onclick = (e) => handleUnitModification(e, 'remove'));
-            document.querySelectorAll('.training-select').forEach(sel => sel.onchange = (e) => handleUnitModification(e, 'training'));
-            document.querySelectorAll('.command-toggle').forEach(btn => btn.onclick = (e) => handleUnitModification(e, 'command'));
-            document.querySelectorAll('.panzerfaust-toggle').forEach(btn => btn.onclick = (e) => handleUnitModification(e, 'panzerfaust'));
+            emptyListMessage.style.display = armyList.length === 0 ? 'table-row' : 'none';
+            attachEventListeners();
+            updateTotalsAndValidation();
+        }
 
+        function attachEventListeners() {
+            document.querySelectorAll('.remove-btn, .remove-weapon-btn').forEach(btn => btn.onclick = e => handleUnitModification(e));
+            document.querySelectorAll('.training-select, .command-checkbox, .panzerfaust-checkbox, .hardpoint-select').forEach(el => el.onchange = e => handleUnitModification(e));
+        }
+
+        function updateTotalsAndValidation() {
             const totalPoints = armyList.reduce((acc, unit) => acc + calculateUnitCost(unit), 0);
             totalPointsEl.textContent = totalPoints;
             limitPointsEl.textContent = pointsLimit;
-            totalPointsEl.classList.toggle('text-green-700', totalPoints <= pointsLimit);
             totalPointsEl.classList.toggle('text-red-600', totalPoints > pointsLimit);
+            totalPointsEl.classList.toggle('text-green-700', totalPoints <= pointsLimit);
             
             const errors = validateArmy();
-            if (errors.length > 0) {
-                validationMessagesEl.innerHTML = errors.map(e => `<li>${e.message}</li>`).join('');
-                validationSection.classList.remove('hidden');
-            } else {
-                validationSection.classList.add('hidden');
-            }
+            validationSection.classList.toggle('hidden', errors.length === 0);
+            validationMessagesEl.innerHTML = errors.map(e => `<li>${e.message}</li>`).join('');
         }
 
-        function validateArmy() {
-            let errors = [];
-            const multiplier = pointsLimit / 600;
-            const totalPoints = armyList.reduce((acc, unit) => acc + calculateUnitCost(unit), 0);
-
-            if (totalPoints > pointsLimit) {
-                errors.push({ message: `Total points (${totalPoints}) exceed the limit of ${pointsLimit}.`, isFatal: true });
-            }
+        function handleUnitModification(e) {
+            const id = parseFloat(e.currentTarget.dataset.id);
+            const unit = armyList.find(u => u.id === id);
+            if (!unit) return;
             
-            const maxUnits = 15 * multiplier;
-            if (armyList.length > maxUnits) {
-                errors.push({ message: `Too many units (${armyList.length}). Maximum is ${maxUnits} for a ${pointsLimit}pt army.`, isFatal: true });
+            const classList = e.currentTarget.classList;
+            if (classList.contains('remove-btn')) armyList = armyList.filter(u => u.id !== id);
+            else if (classList.contains('training-select')) unit.training = e.currentTarget.value;
+            else if (classList.contains('command-checkbox')) unit.hasCommand = e.currentTarget.checked;
+            else if (classList.contains('panzerfaust-checkbox')) unit.hasPanzerfaust = e.currentTarget.checked;
+            else if (classList.contains('hardpoint-select')) {
+                if (e.currentTarget.value) unit.selectedWeapons.push(e.currentTarget.value);
+            } else if (classList.contains('remove-weapon-btn')) {
+                const weaponName = e.currentTarget.dataset.weapon;
+                const index = unit.selectedWeapons.indexOf(weaponName);
+                if (index > -1) unit.selectedWeapons.splice(index, 1);
             }
-
-            const minSuits = Math.ceil(multiplier) * 3;
-            const suitCount = armyList.filter(u => u.Type === 'Suit').length;
-            if (suitCount < minSuits) {
-                errors.push({ message: `Not enough Suits (${suitCount}). You need at least ${minSuits} for a ${pointsLimit}pt army.` });
-            }
-
-            const commonCount = armyList.filter(u => u.Rarity === 'Common' && !(u.Support || u['Universal Resources'] === 'Yes')).length;
-            const rareCount = armyList.filter(u => u.Rarity === 'Rare' && u['Universal Resources'] !== 'Yes' && u.Mobility !== 'Aerial').length;
-            if (rareCount > commonCount) {
-                errors.push({ message: `Number of Rare ground units (${rareCount}) cannot exceed Common ground units (${commonCount}).` });
-            }
-            
-            armyList.filter(u => u.Support).forEach(supportUnit => {
-                const parentUnits = armyList.filter(u => u.Name === supportUnit.Support);
-                if (parentUnits.length === 0) {
-                     errors.push({ message: `Support unit "${supportUnit.Name}" requires a parent "${supportUnit.Support}" unit.`, isFatal: true });
-                }
-                const siblingSupportUnits = armyList.filter(u => u.Support === supportUnit.Support);
-                if(siblingSupportUnits.length > parentUnits.length){
-                     errors.push({ message: `Too many "${supportUnit.Name}" support units. Ratio to parent "${supportUnit.Support}" is 1:1.` });
-                }
-            });
-            
-            const maxUniversal = 5 * multiplier;
-            const universalCount = armyList.filter(u => u['Universal Resources'] === 'Yes').length;
-            if (universalCount > maxUniversal) {
-                 errors.push({ message: `Too many Universal Resources units (${universalCount}). Maximum is ${maxUniversal}.` });
-            }
-            if(universalCount > suitCount){
-                errors.push({ message: `Universal Resources units (${universalCount}) cannot exceed Suit units (${suitCount}).` });
-            }
-
-            const commonAerials = armyList.filter(u => u.Mobility === 'Aerial' && u.Rarity === 'Common').length;
-            const rareAerials = armyList.filter(u => u.Mobility === 'Aerial' && u.Rarity === 'Rare').length;
-             if (rareAerials > commonAerials) {
-                errors.push({ message: `Number of Rare Aerial units (${rareAerials}) cannot exceed Common Aerial units (${commonAerials}).` });
-            }
-            
-            const maxSpecialTraining = 4 * multiplier;
-            const greenCount = armyList.filter(u => u.training === 'Green').length;
-            const eliteCount = armyList.filter(u => u.training === 'Elite' || u.Name.toLowerCase().includes('hero')).length;
-             if (greenCount > maxSpecialTraining) {
-                errors.push({ message: `Too many Green units (${greenCount}). Maximum is ${maxSpecialTraining}.` });
-            }
-             if (eliteCount > maxSpecialTraining) {
-                errors.push({ message: `Too many Elite units (${eliteCount}). Maximum is ${maxSpecialTraining}.` });
-            }
-            
-            const maxCommand = 1 * multiplier;
-            const commandCount = armyList.filter(u => u.hasCommand).length;
-            if (commandCount > maxCommand) {
-                errors.push({ message: `Too many Command upgrades (${commandCount}). Maximum is ${maxCommand}.` });
-            }
-
-            const maxHeroes = 1 * multiplier;
-            const heroCount = armyList.filter(u => u.Name.toLowerCase().includes('hero')).length;
-            if(heroCount > maxHeroes) {
-                errors.push({ message: `Too many Hero units (${heroCount}). Maximum is ${maxHeroes}.` });
-            }
-
-            const fdUnits = armyList.filter(u => u['Forward Deployment'] === 'Yes');
-            const fdPoints = fdUnits.reduce((acc, unit) => acc + calculateUnitCost(unit), 0);
-            const maxFdUnits = 4;
-            if (fdUnits.length > 0) {
-                 const fdPointLimit = totalPoints * 0.20;
-                 if (fdPoints > fdPointLimit && fdUnits.length > maxFdUnits) {
-                      errors.push({ message: `Forward Deployment points (${fdPoints}) exceed 20% of total and you have more than ${maxFdUnits} units.` });
-                 } else if (fdPoints > fdPointLimit) {
-                      errors.push({ message: `Forward Deployment points (${fdPoints}) cannot exceed 20% of total (${fdPointLimit.toFixed(0)}).` });
-                 } else if (fdUnits.length > maxFdUnits) {
-                      errors.push({ message: `Cannot have more than ${maxFdUnits} Forward Deployment units.` });
-                 }
-            }
-            
-            // --- NEW RULES ---
-            const maxCaptured = 1 * multiplier;
-            const capturedCount = armyList.filter(u => u.Name.toLowerCase().includes('captured')).length;
-            if (capturedCount > maxCaptured) {
-                errors.push({ message: `Too many Captured units (${capturedCount}). Maximum is ${maxCaptured}.` });
-            }
-
-            const commandKeywordCount = armyList.filter(u => u.Name.toLowerCase().includes('command')).length;
-            if (commandKeywordCount > maxCommand) {
-                 errors.push({ message: `Too many units with 'Command' in their name (${commandKeywordCount}). Maximum is ${maxCommand}.` });
-            }
-
-            const maxAerialPoints = 120 * multiplier;
-            const aerialUnits = armyList.filter(u => u.Mobility === 'Aerial');
-            const aerialPoints = aerialUnits.reduce((acc, unit) => acc + calculateUnitCost(unit), 0);
-            if (aerialPoints > maxAerialPoints) {
-                errors.push({ message: `Total points for Aerial units (${aerialPoints}) exceed the limit of ${maxAerialPoints}.` });
-            }
-            
-            return errors;
+            render();
         }
-
-        // --- EVENT HANDLERS ---
+        
         function handleFactionChange(e) {
             selectedFaction = e.target.value;
             pageHeader.classList.remove('header-ima', 'header-sdr');
-            if (selectedFaction === 'IMA') pageHeader.classList.add('header-ima');
-            else if (selectedFaction === 'SDR') pageHeader.classList.add('header-sdr');
-            resetArmy();
+            imaLogo.classList.add('hidden');
+            sdrLogo.classList.add('hidden');
+            if (selectedFaction === 'IMA') {
+                pageHeader.classList.add('header-ima');
+                imaLogo.classList.remove('hidden');
+            } else if (selectedFaction === 'SDR') {
+                pageHeader.classList.add('header-sdr');
+                sdrLogo.classList.remove('hidden');
+            }
+            armyList = [];
             populateDropdowns();
+            render();
         }
 
         function handlePointsChange(e) {
@@ -597,19 +473,87 @@
                 render();
             }
         }
-        
-        function handleUnitModification(e, type) {
-            const unitId = parseFloat(e.currentTarget.dataset.id);
-            const unit = armyList.find(u => u.id === unitId);
-            if (!unit) return;
 
-            switch (type) {
-                case 'remove': armyList = armyList.filter(u => u.id !== unitId); break;
-                case 'training': unit.training = e.currentTarget.value; break;
-                case 'command': unit.hasCommand = !unit.hasCommand; break;
-                case 'panzerfaust': unit.hasPanzerfaust = !unit.hasPanzerfaust; break;
+        function validateArmy() {
+            const errors = [];
+            const multiplier = pointsLimit / 600;
+
+            const maxUnits = { 300: 8, 600: 15, 900: 23, 1200: 30 }[pointsLimit] || 0;
+            if (armyList.length > maxUnits) errors.push({ message: `Too many units (${armyList.length}). Maximum is ${maxUnits}.`, isFatal: true });
+
+            const suitCount = armyList.filter(u => u.Type === 'Suit' && !u.Support).length;
+            const minSuits = Math.ceil(multiplier) * 3;
+            if (suitCount < minSuits) errors.push({ message: `Not enough Suits (${suitCount}). You need at least ${minSuits} (Support units do not count).` });
+
+            // Rarity Check
+            const commonCount = armyList.filter(u => u.Rarity === 'Common' && !u.Support).length;
+            const rareCount = armyList.filter(u => u.Rarity === 'Rare' && !u.Support).length;
+            if (rareCount > commonCount) {
+                errors.push({ message: `Number of Rare units (${rareCount}) cannot exceed Common units (${commonCount}).` });
             }
-             render();
+
+            // Support Unit 1:1 Ratio Check
+            const parentUnits = {};
+            armyList.forEach(u => {
+                if (u.Support) {
+                    if (!parentUnits[u.Support]) parentUnits[u.Support] = { parents: 0, supports: 0 };
+                    parentUnits[u.Support].supports++;
+                }
+            });
+            armyList.forEach(u => {
+                 if (parentUnits[u.Name]) parentUnits[u.Name].parents++;
+            });
+            for (const parentName in parentUnits) {
+                const data = parentUnits[parentName];
+                if (data.supports > data.parents) {
+                    errors.push({ message: `Too many support units for "${parentName}". Ratio is 1:1 (${data.supports} supports to ${data.parents} parents).` });
+                }
+            }
+
+            const getTieredMax = (base) => (pointsLimit <= 600 ? base : base * 2);
+
+            const heroCount = armyList.filter(u => u.Name.toLowerCase().includes('hero')).length;
+            if (heroCount > getTieredMax(1)) errors.push({ message: `Too many Hero units (${heroCount}). Maximum is ${getTieredMax(1)}.` });
+            
+            const capturedCount = armyList.filter(u => u.Name.toLowerCase().includes('captured')).length;
+            if (capturedCount > getTieredMax(1)) errors.push({ message: `Too many Captured units (${capturedCount}). Maximum is ${getTieredMax(1)}.` });
+
+            const universalCount = armyList.filter(u => u['Universal Resources'] === 'Yes').length;
+            if (universalCount > getTieredMax(5)) errors.push({ message: `Too many Universal Resources units (${universalCount}). Maximum is ${getTieredMax(5)}.` });
+            if(universalCount > suitCount) errors.push({ message: `Universal Resources units (${universalCount}) cannot exceed Suit units (${suitCount}).` });
+
+            const commandUpgrades = armyList.filter(u => u.hasCommand).length;
+            const commandKeywords = armyList.filter(u => u.Name.toLowerCase().includes('command')).length;
+            const totalCommand = commandUpgrades + commandKeywords;
+            if (totalCommand > getTieredMax(1)) errors.push({ message: `Too many Command units (${totalCommand}). Maximum is ${getTieredMax(1)}.` });
+
+            // Forward Deployment Check
+            const fdUnits = armyList.filter(u => u['Forward Deployment'] === 'Yes');
+            if (fdUnits.length > 0) {
+                const fdPoints = fdUnits.reduce((acc, unit) => acc + calculateUnitCost(unit), 0);
+                const fdPointLimit = pointsLimit * 0.20;
+                if (fdPoints > fdPointLimit) {
+                    errors.push({ message: `Forward Deployment points (${fdPoints}) cannot exceed 20% of the point limit (${fdPointLimit.toFixed(0)}).` });
+                }
+            }
+
+            const aerialUnits = armyList.filter(u => u.Mobility === 'Aerial');
+            const aerialPoints = aerialUnits.reduce((acc, unit) => acc + calculateUnitCost(unit), 0);
+            const maxAerialPoints = 120 * multiplier;
+            if (aerialPoints > maxAerialPoints) errors.push({ message: `Aerial unit points (${aerialPoints}) exceed the limit of ${maxAerialPoints}.` });
+            
+            // Aerial Command Check
+            if (aerialUnits.some(u => u.hasCommand)) {
+                 errors.push({ message: `Aerial units cannot be given the Command upgrade.` });
+            }
+            
+            aerialUnits.forEach(unit => {
+                const maxHP = unit['Hard Points'] || 0;
+                const usedHP = unit.selectedWeapons.reduce((acc, w_name) => acc + (hardPointWeapons.find(w => w.name === w_name)?.cost || 0), 0);
+                if (usedHP > maxHP) errors.push({ message: `"${unit.Name}" has exceeded its Hard Point limit (${usedHP}/${maxHP}).` });
+            });
+
+            return errors;
         }
 
         function exportPDF() {
@@ -617,17 +561,16 @@
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(18);
             doc.text('MaK in 15mm Army Roster', 105, 15, { align: 'center' });
-
+            
             const factionImageData = factionImagesBase64[selectedFaction];
-            let infoY = 25; // Y position for info text like Faction, Points
+            let infoY = 25;
 
             if (factionImageData) {
-                // Image dimensions: The original is approx 12.3:1 ratio
-                const imgWidth = 140; // width in mm for the PDF
-                const imgHeight = imgWidth / 12.3;
-                const imgX = (doc.internal.pageSize.getWidth() - imgWidth) / 2; // Center the image
+                const imgWidth = 140; 
+                const imgHeight = imgWidth / 12.3; 
+                const imgX = (doc.internal.pageSize.getWidth() - imgWidth) / 2;
                 doc.addImage(factionImageData, 'JPEG', imgX, 20, imgWidth, imgHeight);
-                infoY = 25 + imgHeight; // Move text down to be below the image
+                infoY = 25 + imgHeight;
             }
 
             doc.setFontSize(12);
@@ -638,17 +581,16 @@
             doc.text(`Total Points: ${totalPoints}`, 196, infoY, { align: 'right' });
 
             const tableData = armyList.map(unit => {
-                const isHero = unit.Name.toLowerCase().includes('hero');
-                const hasCommandKeyword = unit.Name.toLowerCase().includes('command');
-                const canHavePanzerfaust = ['Suit', 'Infantry'].includes(unit.Type);
-                const trainingText = isHero ? 'Elite' : unit.training;
-                const commandText = hasCommandKeyword ? 'Inherent' : (unit.hasCommand ? 'Yes' : 'No');
-                const panzerfaustText = canHavePanzerfaust ? (unit.hasPanzerfaust ? 'Yes' : 'No') : 'N/A';
+                const trainingText = unit.Name.toLowerCase().includes('hero') ? 'Elite' : unit.training;
+                const hardPointsText = unit.selectedWeapons.join(', ') || '-';
+                const commandText = unit.Name.toLowerCase().includes('command') || unit.Mobility === 'Aerial' ? '-' : (unit.hasCommand ? 'Yes' : 'No');
+                const panzerfaustText = ['Suit', 'Infantry'].includes(unit.Type) ? (unit.hasPanzerfaust ? 'Yes' : 'No') : '-';
                 
                 return [
                     unit.Name,
                     unit.Rarity,
                     trainingText,
+                    hardPointsText,
                     commandText,
                     panzerfaustText,
                     calculateUnitCost(unit)
@@ -656,19 +598,19 @@
             });
 
             doc.autoTable({
-                head: [['Unit', 'Rarity', 'Training', 'Command', 'Panzerfaust', 'Cost']],
+                head: [['Unit', 'Rarity', 'Training', 'Hard Points', 'Command', 'Panzerfaust', 'Cost']],
                 body: tableData,
                 startY: infoY + 5,
                 theme: 'grid',
                 headStyles: { fillColor: [79, 94, 106], halign: 'left' },
                 styles: { font: 'helvetica', fontSize: 10, cellPadding: 2, halign: 'left' },
+                columnStyles: { 6: { halign: 'right' } }
             });
 
-            doc.save(`MaK_Army_List_${selectedFaction}_${pointsLimit}pts.pdf`);
+             doc.save(`MaK_Army_List_${selectedFaction}_${pointsLimit}pts.pdf`);
         }
         
         initialize();
-
     </script>
 </body>
 </html>
