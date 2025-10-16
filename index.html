@@ -512,6 +512,16 @@
 
             const getTieredMax = (base) => (pointsLimit <= 600 ? base : base * 2);
 
+            const maxSpecialTraining = getTieredMax(4);
+            const greenCount = armyList.filter(u => u.training === 'Green').length;
+            if (greenCount > maxSpecialTraining) {
+                errors.push({ message: `Too many Green units (${greenCount}). Maximum is ${maxSpecialTraining}.` });
+            }
+            const eliteCount = armyList.filter(u => u.training === 'Elite' || u.Name.toLowerCase().includes('hero')).length;
+            if (eliteCount > maxSpecialTraining) {
+                errors.push({ message: `Too many Elite units (${eliteCount}). Maximum is ${maxSpecialTraining}.` });
+            }
+
             const heroCount = armyList.filter(u => u.Name.toLowerCase().includes('hero')).length;
             if (heroCount > getTieredMax(1)) errors.push({ message: `Too many Hero units (${heroCount}). Maximum is ${getTieredMax(1)}.` });
             
@@ -614,4 +624,5 @@
     </script>
 </body>
 </html>
+
 
