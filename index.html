@@ -36,8 +36,9 @@
         }
         #page-header {
             background-image: var(--header-default);
-            background-size: cover;
-            background-position: center;
+            background-size: auto 100%; /* Scale height to 100% (96px), width auto */
+            background-position: left center; /* Start tiling from the left */
+            background-repeat: repeat-x; /* Repeat horizontally */
             color: white;
             transition: background-image 0.5s ease-in-out;
             position: relative;
