@@ -41,8 +41,8 @@
             
             /* Apply settings to both layers */
             background-size: auto 100%, auto 100%; /* Scale height to 100% for both */
-            background-position: left center, left center; /* Start tiling from the left for both */
-            background-repeat: repeat-x, repeat-x; /* Repeat horizontally for both */
+            background-position: center center, left center; /* Center overlay, tile header */
+            background-repeat: no-repeat, repeat-x; /* Don't repeat overlay, repeat header */
             
             color: white;
             transition: background-image 0.5s ease-in-out;
@@ -128,9 +128,9 @@
     <header id="page-header" class="mb-8 shadow-lg h-24 flex items-center justify-center">
         <img id="ima-logo" src="https://i.imgur.com/CTCo37x.png" alt="IMA Logo" class="absolute top-0 left-0 h-full w-auto p-2 z-10 hidden">
         <img id="sdr-logo" src="https://i.imgur.com/QOuVXxB.png" alt="SDR Logo" class="absolute top-0 left-0 h-full w-auto p-2 z-10 hidden">
-        <img id="mak-logo" src="https://i.imgur.com/kCzVk5h.png" alt="MaK Logo" class="absolute top-0 right-0 h-full w-auto p-2 z-10">
+        <img id="mak-logo" src="https://i.imgur.com/FnXlvwN.png" alt="MaK Logo" class="absolute top-0 right-0 h-full w-auto p-2 z-10"> <!-- Corrected Ma.K. logo URL -->
         <h1 class="sr-only">MaK in 15mm Army Builder</h1>
-        <p class="sr-only">V1.0.3 - Header Image Update</p>
+        <p class="sr-only">V1.0.4 - Header Fix</p>
     </header>
 
     <div class="container mx-auto p-4 md:p-8 max-w-7xl">
