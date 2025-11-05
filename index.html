@@ -23,9 +23,9 @@
         as requested to ensure they always appear correctly.
         */
         :root {
-            --header-default: url('https://i.imgur.com/5eVzsBZ.jpeg');
-            --header-ima: url('https://i.imgur.com/SBo8wa6.jpeg');
-            --header-sdr: url('https://i.imgur.com/i1Paf7r.jpeg');
+            --header-default: url('https://i.imgur.com/xbvnVgB.jpeg');
+            --header-ima: url('https://i.imgur.com/bO0xIFu.jpeg');
+            --header-sdr: url('https://i.imgur.com/pd8mSYs.jpeg');
         }
 
         /* Custom styles for the new theme */
@@ -124,7 +124,7 @@
         <img id="sdr-logo" src="https://i.imgur.com/QOuVXxB.png" alt="SDR Logo" class="absolute top-0 left-0 h-full w-auto p-2 z-10 hidden">
         <img id="mak-logo" src="https://i.imgur.com/FnXlvwN.png" alt="MaK Logo" class="absolute top-0 right-0 h-full w-auto p-2 z-10">
         <h1 class="sr-only">MaK in 15mm Army Builder</h1>
-        <p class="sr-only">V1.0.1 - Style Fix</p>
+        <p class="sr-only">V1.0.2 - Universal Aerials</p>
     </header>
 
     <div class="container mx-auto p-4 md:p-8 max-w-7xl">
@@ -187,6 +187,7 @@
                                 <th class="text-center">Command</th>
                                 <th class="text-center">Panzerfaust</th>
                                 <th class="text-center">Cost</th>
+                                <th class="text-center">Duplicate</th>
                                 <th class="text-center">Remove</th>
                             </tr>
                         </thead>
@@ -220,8 +221,8 @@
         ];
 
         const factionImagesBase64 = {
-            IMA: 'data:image/jpeg;base64,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',
-            SDR: 'data:image/jpeg;base64,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'
+            IMA: 'data:image/jpeg;base64,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',
+            SDR: 'data:image/jpeg;base64,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'
         };
         
         let unitData = [];
@@ -301,16 +302,19 @@
             const categories = [
                 { title: 'Ground Units (Common)', filters: { Faction: selectedFaction, Rarity: 'Common', Mobility: 'Ground', 'Universal Resources': '' } },
                 { title: 'Ground Units (Rare)', filters: { Faction: selectedFaction, Rarity: 'Rare', Mobility: 'Ground', 'Universal Resources': '' } },
-                { title: 'Aerial Units (Common)', filters: { Faction: selectedFaction, Rarity: 'Common', Mobility: 'Aerial' } },
-                { title: 'Aerial Units (Rare)', filters: { Faction: selectedFaction, Rarity: 'Rare', Mobility: 'Aerial' } },
+                { title: 'Aerial Units (Common)', filters: { Faction: selectedFaction, Rarity: 'Common', Mobility: 'Aerial', 'Universal Resources': '' } },
+                { title: 'Aerial Units (Rare)', filters: { Faction: selectedFaction, Rarity: 'Rare', Mobility: 'Aerial', 'Universal Resources': '' } },
                 { title: 'Universal Resources Ground (Common)', filters: { Rarity: 'Common', Mobility: 'Ground', 'Universal Resources': 'Yes' } },
                 { title: 'Universal Resources Ground (Rare)', filters: { Rarity: 'Rare', Mobility: 'Ground', 'Universal Resources': 'Yes' } },
+                { title: 'Universal Resources Aerial Units (Common)', filters: { Rarity: 'Common', Mobility: 'Aerial', 'Universal Resources': 'Yes' } },
+                { title: 'Universal Resources Aerial Units (Rare)', filters: { Rarity: 'Rare', Mobility: 'Aerial', 'Universal Resources': 'Yes' } },
             ];
 
             const pairings = [
                 ['Ground Units (Common)', 'Ground Units (Rare)'],
                 ['Aerial Units (Common)', 'Aerial Units (Rare)'],
-                ['Universal Resources Ground (Common)', 'Universal Resources Ground (Rare)']
+                ['Universal Resources Ground (Common)', 'Universal Resources Ground (Rare)'],
+                ['Universal Resources Aerial Units (Common)', 'Universal Resources Aerial Units (Rare)']
             ];
 
             pairings.forEach(pair => {
@@ -318,6 +322,8 @@
                     const category = categories.find(c => c.title === title);
                     const units = unitData.filter(unit => Object.entries(category.filters).every(([key, value]) => {
                         if (key === 'Faction' && category.filters['Universal Resources'] === 'Yes') return true;
+                        // Handle empty string filter for keys that might not exist on all units
+                        if (value === '') return (unit[key] || '') === '';
                         return (unit[key] || '') === value;
                     }));
                     if (units.length === 0) return null;
@@ -340,14 +346,42 @@
             }));
         }
         
-        function addUnit(unitName) {
-            const unitTemplate = unitData.find(u => u.Name === unitName);
-            if (!unitTemplate) return;
-            const newUnit = { ...unitTemplate, id: Date.now() + Math.random(), training: 'Regular', hasCommand: false, hasPanzerfaust: false, selectedWeapons: [] };
-            armyList.push(newUnit);
-            if (validateArmy().some(e => e.isFatal)) {
-                armyList.pop();
+        function addUnit(unitName, unitToCopy = null) {
+            let newUnit;
+            if (unitToCopy) {
+                // Deep copy the unit, including its selected options
+                newUnit = { 
+                    ...unitToCopy, 
+                    id: Date.now() + Math.random(),
+                    selectedWeapons: [...unitToCopy.selectedWeapons] // Ensure deep copy of weapons array
+                };
+            } else {
+                const unitTemplate = unitData.find(u => u.Name === unitName);
+                if (!unitTemplate) return;
+                newUnit = { ...unitTemplate, id: Date.now() + Math.random(), training: 'Regular', hasCommand: false, hasPanzerfaust: false, selectedWeapons: [] };
             }
+            
+            // Find insertion index if it's a duplicate
+            let insertIndex = -1;
+            if (unitToCopy) {
+                const originalIndex = armyList.findIndex(u => u.id === unitToCopy.id);
+                if (originalIndex !== -1) {
+                    insertIndex = originalIndex + 1;
+                }
+            }
+            
+            if (insertIndex !== -1) {
+                armyList.splice(insertIndex, 0, newUnit);
+            } else {
+                armyList.push(newUnit);
+            }
+
+            if (validateArmy().some(e => e.isFatal)) {
+                // If the new unit causes a fatal error, remove it.
+                // We need to find it by its new ID to remove the correct one.
+                armyList = armyList.filter(u => u.id !== newUnit.id);
+            }
+            
             render();
         }
         
@@ -402,6 +436,7 @@
                     <td class="text-center">${commandHTML}</td>
                     <td class="text-center">${canHavePanzerfaust ? `<input type="checkbox" class="w-5 h-5 panzerfaust-checkbox" data-id="${unit.id}" ${unit.hasPanzerfaust ? 'checked' : ''}>` : '-'}</td>
                     <td class="text-center font-bold">${calculateUnitCost(unit)}</td>
+                    <td class="text-center"><button class="btn duplicate-btn text-blue-500 hover:bg-blue-100" data-id="${unit.id}">Duplicate</button></td>
                     <td class="text-center"><button class="btn remove-btn text-red-500 hover:bg-red-100" data-id="${unit.id}">X</button></td>
                 </tr>`;
             }).join('');
@@ -412,7 +447,7 @@
         }
 
         function attachEventListeners() {
-            document.querySelectorAll('.remove-btn, .remove-weapon-btn').forEach(btn => btn.onclick = e => handleUnitModification(e));
+            document.querySelectorAll('.remove-btn, .remove-weapon-btn, .duplicate-btn').forEach(btn => btn.onclick = e => handleUnitModification(e));
             document.querySelectorAll('.training-select, .command-checkbox, .panzerfaust-checkbox, .hardpoint-select').forEach(el => el.onchange = e => handleUnitModification(e));
         }
 
@@ -434,11 +469,19 @@
             if (!unit) return;
             
             const classList = e.currentTarget.classList;
-            if (classList.contains('remove-btn')) armyList = armyList.filter(u => u.id !== id);
-            else if (classList.contains('training-select')) unit.training = e.currentTarget.value;
-            else if (classList.contains('command-checkbox')) unit.hasCommand = e.currentTarget.checked;
-            else if (classList.contains('panzerfaust-checkbox')) unit.hasPanzerfaust = e.currentTarget.checked;
-            else if (classList.contains('hardpoint-select')) {
+            
+            if (classList.contains('remove-btn')) {
+                armyList = armyList.filter(u => u.id !== id);
+            } else if (classList.contains('duplicate-btn')) {
+                addUnit(null, unit); // Pass the unit to copy
+                return; // Return early to avoid re-rendering before the new unit is added
+            } else if (classList.contains('training-select')) {
+                unit.training = e.currentTarget.value;
+            } else if (classList.contains('command-checkbox')) {
+                unit.hasCommand = e.currentTarget.checked;
+            } else if (classList.contains('panzerfaust-checkbox')) {
+                unit.hasPanzerfaust = e.currentTarget.checked;
+            } else if (classList.contains('hardpoint-select')) {
                 if (e.currentTarget.value) unit.selectedWeapons.push(e.currentTarget.value);
             } else if (classList.contains('remove-weapon-btn')) {
                 const weaponName = e.currentTarget.dataset.weapon;
@@ -485,11 +528,36 @@
             const minSuits = Math.ceil(multiplier) * 3;
             if (suitCount < minSuits) errors.push({ message: `Not enough Suits (${suitCount}). You need at least ${minSuits} (Support units do not count).` });
 
-            // Rarity Check
-            const commonCount = armyList.filter(u => u.Rarity === 'Common' && !u.Support).length;
-            const rareCount = armyList.filter(u => u.Rarity === 'Rare' && !u.Support).length;
-            if (rareCount > commonCount) {
-                errors.push({ message: `Number of Rare units (${rareCount}) cannot exceed Common units (${commonCount}).` });
+            // Rarity Check (Original broad rule replaced)
+            // const commonCount = armyList.filter(u => u.Rarity === 'Common' && !u.Support).length;
+            // const rareCount = armyList.filter(u => u.Rarity === 'Rare' && !u.Support).length;
+            // if (rareCount > commonCount) {
+            //     errors.push({ message: `Number of Rare units (${rareCount}) cannot exceed Common units (${commonCount}).` });
+            // }
+
+            // New Rarity Checks (breakdown by category)
+            const commonFactionGround = armyList.filter(u => u.Rarity === 'Common' && !u.Support && u.Mobility === 'Ground' && u['Universal Resources'] !== 'Yes').length;
+            const rareFactionGround = armyList.filter(u => u.Rarity === 'Rare' && !u.Support && u.Mobility === 'Ground' && u['Universal Resources'] !== 'Yes').length;
+            if (rareFactionGround > commonFactionGround) { 
+                errors.push({ message: `Rare Faction Ground units (${rareFactionGround}) cannot exceed Common Faction Ground units (${commonFactionGround}).` }); 
+            }
+
+            const commonFactionAerial = armyList.filter(u => u.Rarity === 'Common' && !u.Support && u.Mobility === 'Aerial' && u['Universal Resources'] !== 'Yes').length;
+            const rareFactionAerial = armyList.filter(u => u.Rarity === 'Rare' && !u.Support && u.Mobility === 'Aerial' && u['Universal Resources'] !== 'Yes').length;
+            if (rareFactionAerial > commonFactionAerial) { 
+                errors.push({ message: `Rare Faction Aerial units (${rareFactionAerial}) cannot exceed Common Faction Aerial units (${commonFactionAerial}).` }); 
+            }
+
+            const commonUniversalGround = armyList.filter(u => u.Rarity === 'Common' && !u.Support && u.Mobility === 'Ground' && u['Universal Resources'] === 'Yes').length;
+            const rareUniversalGround = armyList.filter(u => u.Rarity === 'Rare' && !u.Support && u.Mobility === 'Ground' && u['Universal Resources'] === 'Yes').length;
+            if (rareUniversalGround > commonUniversalGround) { 
+                errors.push({ message: `Rare Universal Ground units (${rareUniversalGround}) cannot exceed Common Universal Ground units (${commonUniversalGround}).` }); 
+            }
+
+            const commonUniversalAerial = armyList.filter(u => u.Rarity === 'Common' && !u.Support && u.Mobility === 'Aerial' && u['Universal Resources'] === 'Yes').length;
+            const rareUniversalAerial = armyList.filter(u => u.Rarity === 'Rare' && !u.Support && u.Mobility === 'Aerial' && u['Universal Resources'] === 'Yes').length;
+            if (rareUniversalAerial > commonUniversalAerial) { 
+                errors.push({ message: `Rare Universal Aerial units (${rareUniversalAerial}) cannot exceed Common Universal Aerial units (${commonUniversalAerial}).` }); 
             }
 
             // Support Unit 1:1 Ratio Check
@@ -624,5 +692,3 @@
     </script>
 </body>
 </html>
-
-
